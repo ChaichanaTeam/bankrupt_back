@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, Date
+from sqlalchemy.orm import relationship
 from src.db.base import Base
 
 class User(Base):
@@ -16,3 +17,5 @@ class User(Base):
     state: Column = Column(String, nullable=False)
     post_code: Column = Column(String, nullable=False)
     hashed_password: Column = Column(String, nullable=False)
+
+    wallets = relationship("Wallet", back_populates="users")
