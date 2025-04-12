@@ -14,3 +14,6 @@ class UserCreate(BaseModel):
     state: str
     post_code: str
     password: str
+
+class UserGet(BaseModel):
+    email: EmailStr
