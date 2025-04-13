@@ -15,9 +15,6 @@ class UserCreate(BaseModel):
     post_code: str
     password: str
 
-class UserGet(BaseModel):
-    email: EmailStr
-
 class UserLogin(BaseModel):
     email: str
     password: str

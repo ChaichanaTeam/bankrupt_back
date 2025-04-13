@@ -1,8 +1,9 @@
 from pydantic import BaseModel, EmailStr, Field
+from src.schemas.token import Token
 
 class WalletGet(BaseModel):
     balance: float
-    user_id: int
+    token: Token
 
 class TransferRequest(BaseModel):
     from_email: EmailStr

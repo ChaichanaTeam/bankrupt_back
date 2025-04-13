@@ -16,8 +16,3 @@ def read_root():
 
 app.include_router(user_routes.router, prefix="/auth", tags=["auth"])
 app.include_router(wallet_routes.router, prefix="/account", tags=["account"])
-
-# def init() -> None:
-
-# if __name__ == "__main__":
-#     init()
