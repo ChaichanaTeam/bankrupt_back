@@ -3,17 +3,9 @@ from sqlalchemy.orm import Session
 from src.models.wallet import Wallet
 from src.models.user import User
 from src.schemas.user import UserGet
-from src.db.session import SessionLocal
-from typing import Generator, Any
+from src.db.dependencies import get_db
 
 router: APIRouter = APIRouter()
-
-def get_db() -> Generator[Any | Session, Any, None]:
-    db: Session = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 def get_current_user_id(email: str, db: Session) -> int:
     return db.query(User).filter(User.email == email).first().id
