@@ -1,9 +1,10 @@
 {
 	"info": {
-		"_postman_id": "d2e98128-5dfa-49d9-84c2-9ee63cd2f875",
+		"_postman_id": "9421ec42-e371-4b22-8c93-db06b7154314",
 		"name": "Bunkrupt",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "43912649"
+		"_exporter_id": "43912649",
+		"_collection_link": "https://bunkruptxd.postman.co/workspace/My-Workspace~10ef5b7f-38a8-449c-842e-983570b71f3c/collection/43912649-9421ec42-e371-4b22-8c93-db06b7154314?action=share&source=collection_link&creator=43912649"
 	},
 	"item": [
 		{
@@ -49,15 +50,69 @@
 			"name": "Balance check",
 			"request": {
 				"method": "GET",
-				"header": []
+				"header": [],
+				"url": {
+					"raw": ""
+				}
 			},
 			"response": []
 		},
 		{
 			"name": "Login",
 			"request": {
-				"method": "GET",
-				"header": []
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"2tupojebylo228@mail.ua\",\r\n    \"password\": \"Debil\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Transfer",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/account/wallet/transfer",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"account",
+						"wallet",
+						"transfer"
+					]
+				}
 			},
 			"response": []
 		}
