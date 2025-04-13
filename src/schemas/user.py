@@ -17,3 +17,7 @@ class UserCreate(BaseModel):
 
 class UserGet(BaseModel):
     email: EmailStr
+
+class UserLogin(BaseModel):
+    email: str
+    password: str
