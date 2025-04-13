@@ -1,0 +1,65 @@
+{
+	"info": {
+		"_postman_id": "d2e98128-5dfa-49d9-84c2-9ee63cd2f875",
+		"name": "Bunkrupt",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43912649"
+	},
+	"item": [
+		{
+			"name": "Register form",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"first_name\": \"Bydlo\",\r\n    \"last_name\": \"Tupoje\",\r\n    \"email\": \"tupojebydlo228@mail.ua\",\r\n    \"phone_number\": \"+48228133747\",\r\n    \"date_of_birth\": \"12.12.2012\",\r\n    \"social_security\": \"452-56-859\",\r\n    \"adress\": \"ul. Pushkina, dom Kolotushkina\",\r\n    \"city\": \"Pososite\",\r\n    \"state\": \"Ohio\",\r\n    \"post_code\": \"69-228\",\r\n    \"password\": \"Debil\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/auth/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Balance check",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}

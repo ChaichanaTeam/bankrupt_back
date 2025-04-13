@@ -11,7 +11,7 @@ app: FastAPI = FastAPI()
 Base.metadata.create_all(bind=engine)
 
 @app.get("/")
-def read_root() -> None:
+def read_root():
     return {"message": "Бекенд банковского приложения работает!"}
 
 app.include_router(user_routes.router, prefix="/auth", tags=["auth"])

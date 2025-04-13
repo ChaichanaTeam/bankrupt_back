@@ -1,11 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import Column
 from sqlalchemy.orm import Session
-from src.schemas.user import UserCreate
+from src.schemas.user import UserCreate, UserLogin
+from src.schemas.token import Token
 from src.models.user import User
 from src.models.wallet import Wallet
 from passlib.context import CryptContext
 from src.db.dependencies import get_db
+from src.api.utils.auth import create_access_token
 
 router: APIRouter = APIRouter()
 
@@ -51,11 +53,11 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
 
     return {"email": new_user.email}
 
-# @router.post("/login", response_model=Token)
-# def login(user_data: UserLogin, db: Session = Depends(get_db)):
-#     user = db.query(User).filter(User.email == user_data.email).first()
-#     if not user or not pwd_context.verify(user_data.password, user.hashed_password):
-#         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Неверные учетные данные")
+@router.post("/login", response_model=Token)
+def login(user_data: UserLogin, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == user_data.email).first()
+    if not user or not pwd_context.verify(user_data.password, user.hashed_password):
+        raise HTTPException(status_code=401, detail="Неверные учетные данные")
 
-#     token = create_access_token({"sub": user.email})
-#     return {"access_token": token, "token_type": "bearer"}
+    token = create_access_token({"sub": user.email})
+    return {"access_token": token, "token_type": "bearer"}
