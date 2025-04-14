@@ -23,9 +23,16 @@ def send_verification_email(email: str, token: str):
     msg["From"] = settings.EMAIL
     msg["To"] = email
 
+    link: str
+
+    if settings.IS_DEPLOYED:
+        link = f"https://bankrupt-back.onrender.com/verify-email?token={token}"
+    else:
+        link = f"http://localhost:8000/verify-email?token={token}"
+
     msg.set_content(
         f"Hi!\n\nPlease, verify your email on this link:\n"
-        f"http://localhost:8000/verify-email?token={token}"
+        f"{link}"
     )
 
     try:
