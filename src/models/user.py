@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date
+from sqlalchemy import Column, Integer, String, Date, Boolean
 from sqlalchemy.orm import relationship
 from src.db.base import Base
 
@@ -17,5 +17,10 @@ class User(Base):
     state: Column = Column(String, nullable=False)
     post_code: Column = Column(String, nullable=False)
     hashed_password: Column = Column(String, nullable=False)
+
+    ##
+    is_verified = Column(Boolean, default=False)
+    verification_token = Column(String, nullable=True, unique=True)
+    ##
 
     wallets = relationship("Wallet", back_populates="users")
