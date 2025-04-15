@@ -58,18 +58,22 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
 
-    ##
-    send_verification_email(new_user.email, verification_token)
-    return {"message": "Mail has been send"}
-    ##
 
     new_wallet: Wallet = Wallet(
-        user_id=new_user.id
+        user_id=new_user.id,
+        balance = 100.0
     )
 
     db.add(new_wallet)
     db.commit()
     db.refresh(new_wallet)
+
+    ##
+    send_verification_email(new_user.email, verification_token)
+    return {"message": "Mail has been send"}
+    ##
+
+
 
     return {"email": new_user.email}
 
@@ -95,7 +99,7 @@ def login(user_data: UserLogin, db: Session = Depends(get_db)):
         raise HTTPException(status_code=401, detail="Неверные учетные данные")
 
     ##
-    if not user.is_verified:  # 🔧 ДОДАНО
+    if not user.is_verified:
         raise HTTPException(status_code=403, detail="Email isn't verified")
     ##
 

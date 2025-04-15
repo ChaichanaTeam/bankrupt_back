@@ -6,6 +6,8 @@ from src.schemas.token import Token
 from src.db.dependencies import get_db
 from src.schemas.wallet import TransferRequest
 from src.api.utils.auth import get_current_user
+from src.db.history import SessionLocalHistory
+from src.models.wallet_history import TransferHistory
 
 router: APIRouter = APIRouter()
 
@@ -37,6 +39,16 @@ def transfer_money(transfer: TransferRequest,
     db.refresh(sender_wallet)
     db.refresh(receiver_wallet)
 
+    history_db = SessionLocalHistory()
+    history = TransferHistory(
+        from_user_id=sender_id,
+        to_user_id=receiver,
+        amount=transfer.amount
+    )
+    history_db.add(history)
+    history_db.commit()
+    history_db.close()
+
     return {
         "message": f"Transferred {transfer.amount} {transfer.to_email}"
     }
@@ -49,3 +61,28 @@ def get_balance(user: User = Depends(get_current_user), db: Session = Depends(ge
         raise HTTPException(status_code=400, detail="Account isn't exists")
 
     return {"Balance": wallet.balance}
+
+
+@router.get("/wallet/history")
+def get_transfer_history(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    history_db = SessionLocalHistory()
+
+    records = history_db.query(TransferHistory).filter(
+        (TransferHistory.from_user_id == user.id) |
+        (TransferHistory.to_user_id == user.id)
+    ).order_by(TransferHistory.time.desc()).all()
+
+    result = []
+    for h in records:
+        from_user = db.query(User).filter(User.id == h.from_user_id).first()
+        to_user = db.query(User).filter(User.id == h.to_user_id).first()
+
+        result.append({
+            "from_email": from_user.email if from_user else "Unknown",
+            "to_email": to_user.email if to_user else "Unknown",
+            "amount": h.amount,
+            "time": h.time.strftime("%Y-%m-%d %H:%M:%S")
+        })
+
+    history_db.close()
+    return {"history": result}
