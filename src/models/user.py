@@ -2,6 +2,8 @@ from sqlalchemy import Column, Integer, String, Date, TIMESTAMP, text, Boolean
 from sqlalchemy.orm import relationship
 from src.db.base import Base
 
+## Add new lines for user (check front page)
+
 class User(Base):
     __tablename__ = "users"
 
