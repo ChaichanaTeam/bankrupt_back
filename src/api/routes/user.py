@@ -69,9 +69,6 @@ def verify_email(user: UserCreate, db: Session = Depends(get_db)):
 
     temp_user = get_unverified_user(user.email, db)
 
-    db.delete(temp_user)
-    db.commit()
-
     new_user: User = User(
         first_name=user.first_name,
         last_name=user.last_name,
@@ -87,7 +84,9 @@ def verify_email(user: UserCreate, db: Session = Depends(get_db)):
     )
 
     db.add(new_user)
+    db.delete(temp_user)
     db.commit()
+
     db.refresh(new_user)
     
     new_wallet: Wallet = Wallet(
