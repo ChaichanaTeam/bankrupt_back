@@ -23,7 +23,7 @@ FIELDS_TO_CHECK = {
 }
 
 @router.get("/check-availability")
-def check_availability(payload: AvailabilityRequest, db: Session = Depends(get_db())):
+def check_availability(payload: AvailabilityRequest, db: Session = Depends(get_db)):
     result: dict[str, bool] = {}
     values: dict[str, str] = payload.model_dump(exclude_none=True)
 
