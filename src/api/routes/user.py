@@ -43,8 +43,7 @@ def check_availability(payload: AvailabilityRequest, db: Session = Depends(get_d
 
 @router.post("/register")
 def register_user(user: UserTemp, db: Session = Depends(get_db)):
-    existing: User = is_user_existing(user.email, db)
-    if existing:
+    if is_user_existing(user.email, db):
         raise user_exists_exception
 
     verification_code: str = create_verification_code()
