@@ -40,7 +40,6 @@ def check_availability(payload: AvailabilityRequest, db: Session = Depends(get_d
 
     return result
 
-
 @router.post("/register")
 def register_user(user: UserTemp, db: Session = Depends(get_db)):
     if is_user_existing(user, db):
@@ -68,7 +67,7 @@ def verify_email(user: UserCreate, db: Session = Depends(get_db)):
     if not is_code_valid(user.email, user.verification_code, db):
         raise code_verification_exception
 
-    temp_user: UnverifiedUser = get_unverified_user(user.email, db)
+    temp_user = get_unverified_user(user.email, db)
 
     db.delete(temp_user)
     db.commit()
@@ -84,8 +83,7 @@ def verify_email(user: UserCreate, db: Session = Depends(get_db)):
         city=user.city,
         state=user.state,
         post_code=user.post_code,
-        hashed_password=pwd_context.hash(user.password)#,
-        #created_at= Не знаю что писать
+        hashed_password=pwd_context.hash(user.password)
     )
 
     db.add(new_user)

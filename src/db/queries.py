@@ -11,13 +11,18 @@ def is_user_existing(user: UserCreate, db: Session) -> bool:
         (User.email == user.email) |
         (User.social_security == user.social_security) |
         (User.phone_number == user.phone_number)
+    )).scalar() or \
+    db.query(exists().where(
+        (UnverifiedUser.email == user.email) |
+        (UnverifiedUser.social_security == user.social_security) |
+        (UnverifiedUser.phone_number == user.phone_number)
     )).scalar()
 
 def get_expired_users(threshold: datetime, db: Session) -> list[UnverifiedUser]:
     return db.query(UnverifiedUser).filter(UnverifiedUser.created_at < threshold).all()
 
-def get_unverified_user(email: str, db: Session) -> UnverifiedUser:
-    return db.query(UnverifiedUser).filter(User.email == email).first()
+def get_unverified_user(email: str, db: Session):
+    return db.query(UnverifiedUser).filter(UnverifiedUser.email == email).first()
 
 def get_user(email: str, db: Session) -> User:
     return db.query(User).filter(User.email == email).first()
