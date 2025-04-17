@@ -6,7 +6,6 @@ from src.schemas.token import Token
 from src.db.dependencies import get_db
 from src.schemas.wallet import TransferRequest
 from src.api.utils.auth import get_current_user
-from src.db.history import SessionLocalHistory
 from src.models.wallet_history import TransferHistory
 
 router: APIRouter = APIRouter()
@@ -39,15 +38,14 @@ def transfer_money(transfer: TransferRequest,
     db.refresh(sender_wallet)
     db.refresh(receiver_wallet)
 
-    history_db = SessionLocalHistory()
     history = TransferHistory(
         from_user_id=sender_id,
         to_user_id=receiver,
         amount=transfer.amount
     )
-    history_db.add(history)
-    history_db.commit()
-    history_db.close()
+    db.add(history)
+    db.commit()
+    db.close()
 
     return {
         "message": f"Transferred {transfer.amount} {transfer.to_email}"
@@ -65,9 +63,7 @@ def get_balance(user: User = Depends(get_current_user), db: Session = Depends(ge
 
 @router.get("/wallet/history")
 def get_transfer_history(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    history_db = SessionLocalHistory()
-
-    records = history_db.query(TransferHistory).filter(
+    records = db.query(TransferHistory).filter(
         (TransferHistory.from_user_id == user.id) |
         (TransferHistory.to_user_id == user.id)
     ).order_by(TransferHistory.time.desc()).all()
@@ -84,5 +80,5 @@ def get_transfer_history(user: User = Depends(get_current_user), db: Session = D
             "time": h.time.strftime("%Y-%m-%d %H:%M:%S")
         })
 
-    history_db.close()
+    db.close()
     return {"history": result}

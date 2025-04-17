@@ -1,9 +1,9 @@
 from sqlalchemy import Column, Integer, Float, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime
-from src.db.history import BaseHistory
+from src.db.base import Base
 
-class TransferHistory(BaseHistory):
+class TransferHistory(Base):
     __tablename__ = "transfer_history"
 
     id = Column(Integer, primary_key=True, index=True)
