@@ -13,7 +13,7 @@ def check_availability(payload: AvailabilityRequest, db: Session = Depends(get_d
 
 @router.post("/register")
 def register_user(user: UserTemp, db: Session = Depends(get_db)):
-    UserService.register(UserTemp, db)
+    UserService.register(user, db)
     return {"message": "Mail has been send"}
 
 @router.post("/verify-email")
