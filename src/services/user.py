@@ -37,7 +37,7 @@ class UserService:
             raise user_exists_exception
 
         verification_code = create_verification_code()
-        temp_user = UserTemp(
+        temp_user: UnverifiedUser = UnverifiedUser(
             email=user.email,
             social_security=user.social_security,
             phone_number=user.phone_number,
