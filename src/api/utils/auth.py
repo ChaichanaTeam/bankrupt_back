@@ -8,7 +8,7 @@ from src.models.user import User
 from src.core.config import settings
 from src.core.exceptions import credentials_exception
 from src.db.dependencies import get_db
-from src.db.queries import get_user
+from src.db.queries import get_user_by_email
 import random, string
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
@@ -39,7 +39,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     except JWTError:
         raise credentials_exception
 
-    user = get_user(email, db)
+    user = get_user_by_email(email, db)
     if user is None:
         raise credentials_exception
     

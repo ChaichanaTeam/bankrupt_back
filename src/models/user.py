@@ -26,7 +26,7 @@ class User(Base):
 
     wallets = relationship("Wallet", back_populates="users")
 
-class UserTemp(Base):
+class UnverifiedUser(Base):
     __tablename__ = "unverified_users"
 
     id: Column = Column(Integer, primary_key=True, index=True)
