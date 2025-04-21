@@ -4,15 +4,36 @@ from src.core.config import settings
 
 class EmailServer:
     def __init__(self):
-        self.smtp: smtplib.SMTP = smtplib.SMTP("smtp.gmail.com", 587)
+        self.connect()
+
+    def connect(self) -> None:
+        self.smtp = smtplib.SMTP("smtp.gmail.com", 587)
         self.smtp.starttls()
         self.smtp.login(settings.EMAIL, settings.EMAIL_PASSWORD)
     
+    def is_connected(self) -> bool:
+        try:
+            status = self.smtp.noop()[0]
+            return 200 <= status <= 299
+        except:
+            return False
+
     def send_message(self, msg: EmailMessage) -> None:
-        self.smtp.send_message(msg)
+        if self.smtp is None or not self.is_connected():
+            self.connect()
+        try:
+            self.smtp.send_message(msg)
+        except Exception as e:
+            print(f"Resending after reconnect: {e}")
+            self.connect()
+            self.smtp.send_message(msg)
 
     def __del__(self):
-        self.smtp.quit()
+        if self.smtp:
+            try:
+                self.smtp.quit()
+            except:
+                pass
     
 
 email_service: EmailServer = EmailServer()
