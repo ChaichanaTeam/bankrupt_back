@@ -5,6 +5,7 @@ from src.schemas.user import UserCreate, UserLogin
 from src.schemas.token import Token
 from src.models.wallet import Wallet
 from src.models.wallet_history import TransferHistory
+from src.models.cards import Card
 from src.models.user import User, UnverifiedUser 
 
 def is_user_existing(user: UserCreate, db: Session) -> bool:

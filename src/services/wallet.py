@@ -1,3 +1,7 @@
+import random
+from datetime import datetime, timedelta
+from src.models.cards import Card
+from sqlalchemy import exists
 from sqlalchemy.orm import Session
 from src.models.wallet import Wallet
 from src.models.user import User
