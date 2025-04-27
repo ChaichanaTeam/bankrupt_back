@@ -7,10 +7,11 @@ from src.db.queries import is_user_existing, is_code_valid, get_unverified_user,
 from src.api.utils.auth import create_access_token, create_verification_code
 from src.api.utils.mail import send_verification_email
 from src.core.exceptions import user_exists_exception, code_verification_exception, credentials_exception
+from src.services.base_user import BaseUserService
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-class UserService:
+class UserService(BaseUserService):
     @staticmethod
     def check_availability(payload: dict[str, str], db: Session) -> dict[str, bool]:
         fields_to_check = {
@@ -84,12 +85,3 @@ class UserService:
         db.add(new_wallet)
         db.commit()
         db.refresh(new_wallet)
-
-    @staticmethod
-    def login(user_data: UserLogin, db: Session) -> str:
-        user = get_user_by_email(user_data.email, db)
-
-        if not user or not pwd_context.verify(user_data.password, user.hashed_password):
-            raise credentials_exception
-
-        return create_access_token({"sub": user.email})

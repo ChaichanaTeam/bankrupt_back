@@ -1,0 +1,17 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Login to panel{% endblock %}
+
+{% block content %}
+
+<form method="post" action="/admin/login" class="box centered">
+    <h1 class="header-text centered">Login</h1>
+    {% if error %}
+        <p class="warning-box warning-box-red">{{ error }}</p>
+    {% endif %}
+    <input type="email" name="email" placeholder="Email" required class="input-field centered">
+    <input type="password" name="password" placeholder="Password" required class="input-field centered">
+    <button type="submit" class="btn">Login</button>
+</form>
+
+{% endblock %}

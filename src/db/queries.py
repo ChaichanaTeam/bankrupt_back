@@ -1,6 +1,6 @@
 from datetime import timedelta, datetime
 from sqlalchemy.orm import Session
-from sqlalchemy import exists
+from sqlalchemy import exists, select
 from src.schemas.user import UserCreate, UserLogin
 from src.schemas.token import Token
 from src.models.wallet import Wallet
@@ -20,7 +20,7 @@ def is_user_existing(user: UserCreate, db: Session) -> bool:
         (UnverifiedUser.phone_number == user.phone_number)
     )).scalar()
 
-def get_expired_users(threshold: datetime, db: Session) -> list[UnverifiedUser]:
+def get_expired_users(db: Session, threshold: datetime = datetime.now()) -> list[UnverifiedUser]:
     return db.query(UnverifiedUser).filter(UnverifiedUser.created_at < threshold).all()
 
 def get_unverified_user(email: str, db: Session) -> UnverifiedUser:
@@ -29,7 +29,7 @@ def get_unverified_user(email: str, db: Session) -> UnverifiedUser:
 def get_user_by_email(email: str, db: Session) -> User:
     return db.query(User).filter(User.email == email).first()
 
-def get_user_by_id(id: str, db: Session) -> User:
+def get_user_by_id(id: int, db: Session) -> User:
     return db.query(User).filter(User.id == id).first()
 
 def is_code_valid(email: str, code: str, db: Session) -> bool:
@@ -46,3 +46,12 @@ def get_transfer_records_of_id(id: int, db: Session):
             (TransferHistory.from_user_id == id) |
             (TransferHistory.to_user_id == id)
         ).order_by(TransferHistory.time.desc()).all()
+
+def is_superuser(id: int, db: Session) -> bool:
+    return db.query(exists().where(
+        (User.id == id) &
+        (User.is_superuser == True)
+    )).scalar()
+
+def get_all_users(db: Session) -> list[User]:
+    return db.execute(select(User)).scalars().all()

@@ -1,5 +1,5 @@
-from datetime import datetime, timedelta
-from jose import JWTError, jwt
+from datetime import datetime, timedelta, timezone
+from jose import JWTError, ExpiredSignatureError, jwt
 from typing import Any
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
@@ -10,17 +10,18 @@ from src.core.exceptions import credentials_exception
 from src.db.dependencies import get_db
 from src.db.queries import get_user_by_email
 import random, string
+from src.core.traceback import traceBack, TrackType
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
-SECRET_KEY = settings.SECRET_KEY
-ALGORITHM = settings.ALGORITHM
-ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
 
-def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
+def create_access_token(data: dict, expires_delta: timedelta = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)) -> str:
     to_encode = data.copy()
-    expire = datetime.now() + (expires_delta or timedelta(minutes=15))
+
+    expire = datetime.now(timezone.utc) + expires_delta
     to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    
+    traceBack(f"Token was created for {data}, valid before {expire}")
+    return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
 def create_verification_code() -> str:
     nums = random.choices(string.digits, k=4)
@@ -32,15 +33,38 @@ def create_verification_code() -> str:
 
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
     try:
-        payload: dict[str, Any] = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        payload: dict[str, Any] = jwt.decode(token, settings.SECRET_KEY, algorithms=settings.ALGORITHM, options={"verify_exp": True})
         email: str = payload.get("sub")
         if email is None:
-            raise credentials_exception
+            raise credentials_exception()
+                
+    except ExpiredSignatureError:
+        raise credentials_exception("Token expired")
     except JWTError:
-        raise credentials_exception
+        raise credentials_exception()
 
     user = get_user_by_email(email, db)
     if user is None:
-        raise credentials_exception
+        raise credentials_exception()
+    
+    return user
+
+def get_current_user_cookie(token: str, db: Session) -> User:
+    try:
+        payload: dict[str, Any] = jwt.decode(token, settings.SECRET_KEY, algorithms=settings.ALGORITHM, options={"verify_exp": True})
+        email: str = payload.get("sub")
+        
+        if not email:
+            raise credentials_exception()
+    
+        traceBack(f"Token decoded: {payload}")
+    except ExpiredSignatureError:
+        raise credentials_exception("Token expired")
+    except JWTError:
+        raise credentials_exception()
+
+    user = get_user_by_email(email, db)
+    if user is None or not user.is_superuser:
+        raise credentials_exception()
     
     return user

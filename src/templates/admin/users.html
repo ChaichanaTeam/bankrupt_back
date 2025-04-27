@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-8">
+    <h1 class="text-2xl font-bold mb-6">Users</h1>
+
+    <table class="min-w-full bg-white">
+        <thead>
+            <tr>
+                <th class="py-2 px-4 border-b">ID</th>
+                <th class="py-2 px-4 border-b">Email</th>
+                <th class="py-2 px-4 border-b">Role</th>
+                <th class="py-2 px-4 border-b">Created at</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr class="text-center hover:bg-gray-100 cursor-pointer" onclick="window.location='/admin/users/{{ user.id }}'">
+                <td class="py-2 px-4 border-b">{{ user.id }}</td>
+                <td class="text-blue-500 hover:underline">{{ user.email }}</td>
+                <td class="py-2 px-4 border-b">{{ "Admin" if user.is_superuser else "Client" }}</td>
+                <td class="py-2 px-4 border-b">{{ user.created_at.strftime("%Y-%m-%d %H:%M:%S") if user.created_at else "-" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <br>
+
+    <h1 class="text-2xl font-bold mb-6">Unverified Users</h1>
+
+    <table class="min-w-full bg-white">
+        <thead>
+            <tr>
+                <th class="py-2 px-4 border-b">ID</th>
+                <th class="py-2 px-4 border-b">Email</th>
+                <th class="py-2 px-4 border-b">Code</th>
+                <th class="py-2 px-4 border-b">Created at</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in unverified_users %}
+            <tr class="text-center hover:bg-gray-100 cursor-pointer" onclick="window.location='/admin/users/{{ user.id }}'">
+                <td class="py-2 px-4 border-b">{{ user.id }}</td>
+                <td class="text-blue-500 hover:underline">{{ user.email }}</td>
+                <td class="py-2 px-4 border-b">{{ user.code }}</td>
+                <td class="py-2 px-4 border-b">{{ user.created_at.strftime("%Y-%m-%d %H:%M:%S") if user.created_at else "-" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="mt-6">
+        <a href="/admin/panel" class="text-blue-500 hover:underline">Back to panel</a>
+    </div>
+</body>
+</html>
