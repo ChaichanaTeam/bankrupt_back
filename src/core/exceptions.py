@@ -25,6 +25,11 @@ user_not_found: HTTPException = HTTPException(
     detail="User not found"
 )
 
+card_not_found: HTTPException = HTTPException(
+    status_code=status.HTTP_406_NOT_ACCEPTABLE,
+    detail="Card not found"
+)
+
 def forbidden_wallet_action(reason: str) -> HTTPException:
     return HTTPException(status_code=status.HTTP_403_FORBIDDEN, 
                          detail=reason)

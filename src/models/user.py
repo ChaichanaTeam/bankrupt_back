@@ -26,7 +26,7 @@ class User(Base):
 
     is_superuser: Column = Column(Boolean, default=False)
 
-    wallets = relationship("Wallet", back_populates="users")
+    wallets = relationship("Wallet", back_populates="user")
 
 class UnverifiedUser(Base):
     __tablename__ = "unverified_users"
