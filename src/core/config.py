@@ -3,17 +3,19 @@ from pathlib import Path
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from src.core.traceback import traceBack, TrackType
+from fastapi.templating import Jinja2Templates
 
-env_path: Path = Path(__file__).resolve().parents[2] / ".env" / "var.env"
-
-if env_path.exists():
-    load_dotenv(dotenv_path=env_path)
-    traceBack(".env loaded")
-else:
-    traceBack(".env not loaded, using os variables if exists. Check for variables if errors are raised")
-    
 class Settings:
     def __init__(self):
+        env_path: Path = Path(__file__).resolve().parents[2] / ".env" / "var.env"
+
+        if env_path.exists():
+            load_dotenv(dotenv_path=env_path)
+            traceBack(".env loaded")
+        else:
+            traceBack(".env not loaded, using os variables if exists. Check for variables if errors are raised")
+            
+
         self.DATABASE_URL: str = "sqlite:///./bank.db"
         self.SECRET_KEY: str = os.getenv("SECRET_KEY", "fallback-key")
         self.ALGORITHM: str = "HS256"
@@ -24,6 +26,7 @@ class Settings:
         self.ORIGINS: list[str] = self._get_origins()
         traceBack(f"Loaded origins {self.ORIGINS}")
         self.APP: FastAPI = None
+        self.TEMPLATES: Jinja2Templates = Jinja2Templates(directory="src/templates")
     
     def _get_origins(self) -> list[str]:
         origins = []

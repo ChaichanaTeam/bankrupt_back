@@ -4,6 +4,8 @@ from src.schemas.user import UserCreate, UserLogin, UserTemp, AvailabilityReques
 from src.schemas.token import Token
 from src.db.dependencies import get_db
 from src.services.user import UserService
+from src.models.user import User
+from src.api.utils.auth import get_current_user
 
 router: APIRouter = APIRouter()
 
@@ -25,6 +27,10 @@ def verify_email(user: UserCreate, db: Session = Depends(get_db)):
 def login(user_data: UserLogin, db: Session = Depends(get_db)):
     token = UserService.login(user_data, db)
     return { "token_type": "Bearer", "access_token": token }
+
+@router.get("/me")
+def get_user_base_data(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    return UserService.get_user_base_data(user, db)
 
 ## TODO login 2FA
 

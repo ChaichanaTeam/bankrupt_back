@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from jose import JWTError, ExpiredSignatureError, jwt
 from typing import Any
-from fastapi import Depends
+from fastapi import Depends, Cookie, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from src.models.user import User
@@ -20,7 +20,6 @@ def create_access_token(data: dict, expires_delta: timedelta = timedelta(minutes
     expire = datetime.now(timezone.utc) + expires_delta
     to_encode.update({"exp": expire})
     
-    traceBack(f"Token was created for {data}, valid before {expire}")
     return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
 def create_verification_code() -> str:
@@ -32,12 +31,15 @@ def create_verification_code() -> str:
     return ''.join(code)
 
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
+    if not token:
+        raise credentials_exception("Not a valid token")
+    
     try:
         payload: dict[str, Any] = jwt.decode(token, settings.SECRET_KEY, algorithms=settings.ALGORITHM, options={"verify_exp": True})
         email: str = payload.get("sub")
-        if email is None:
+        if not email:
             raise credentials_exception()
-                
+    
     except ExpiredSignatureError:
         raise credentials_exception("Token expired")
     except JWTError:
@@ -49,22 +51,8 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     
     return user
 
-def get_current_user_cookie(token: str, db: Session) -> User:
+def get_current_user_cookie(token: str = Cookie(None, alias="admin_token"), db: Session = Depends(get_db)) -> User | str:
     try:
-        payload: dict[str, Any] = jwt.decode(token, settings.SECRET_KEY, algorithms=settings.ALGORITHM, options={"verify_exp": True})
-        email: str = payload.get("sub")
-        
-        if not email:
-            raise credentials_exception()
-    
-        traceBack(f"Token decoded: {payload}")
-    except ExpiredSignatureError:
-        raise credentials_exception("Token expired")
-    except JWTError:
-        raise credentials_exception()
-
-    user = get_user_by_email(email, db)
-    if user is None or not user.is_superuser:
-        raise credentials_exception()
-    
-    return user
+        return get_current_user(token, db)
+    except HTTPException as e:
+        return e.detail

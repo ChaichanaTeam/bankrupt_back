@@ -5,66 +5,79 @@ from src.models.user import User
 from src.db.dependencies import get_db
 from src.db.queries import get_all_users, get_user_by_id, get_expired_users
 from src.services.admin import AdminService
+from src.api.utils.auth import get_current_user_cookie
 from fastapi.responses import RedirectResponse
-from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from src.core.exceptions import user_not_found
 from starlette.status import HTTP_302_FOUND
-from typing import Optional
+from typing import Any
+from src.core.templates import template, AdminHTML
+from src.core.config import settings
 from src.core.traceback import traceBack, TrackType
 
 router: APIRouter = APIRouter()
-templates = Jinja2Templates(directory="src/templates")
 
 @router.get("/login")
-def admin_login_get(request: Request):
-    return templates.TemplateResponse("admin/login.html", {"request": request, "hide_nav": True, "error": None})
+@template(AdminHTML.LOGIN)
+def admin_login_gui(request: Request) -> dict[str, Any]:
+    return {"hide_nav": True, "error": None}
 
 @router.post("/login")
-def admin_login_post(request: Request,
+@template(AdminHTML.LOGIN)
+def admin_login_form(request: Request,
                      email: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
     admin_login: UserLogin = UserLogin(email=email, password=password)
 
     try:
         token = AdminService.login(admin_login, db)
-    except HTTPException:
-        return templates.TemplateResponse("admin/login.html", {"request": request, "hide_nav": True, "error": "Invalid credentials"})
+    except HTTPException as e:
+        return (AdminHTML.LOGIN, {"hide_nav": True, "error": f"{e.detail}"})
     except Exception as e:
         traceBack(f"{e}", type=TrackType.ERROR)
-        return templates.TemplateResponse("admin/login.html", {"request": request, "hide_nav": True, "error": "Technical issues"})
+        return ("admin/login.html", {"request": request, "hide_nav": True, "error": "Technical issues"})
 
-    resp = RedirectResponse("/admin/panel", status_code=HTTP_302_FOUND)
+    resp = RedirectResponse(url="/admin/panel", status_code=HTTP_302_FOUND)
     resp.set_cookie(key="admin_token", value=token, httponly=True)
     return resp
 
 @router.get("/panel")
+@template(AdminHTML.PANEL)
 def admin_panel(request: Request,
-                token: str = Cookie(None, alias="admin_token"), db: Session = Depends(get_db), deleted: Optional[int] = None):
-    admin: User = AdminService.validate(token, db)
-
-    return templates.TemplateResponse("admin/panel.html", {"request": request, "deleted": deleted, "user": admin})
+                admin: User = Depends(get_current_user_cookie), db: Session = Depends(get_db),
+                deleted: int | None = None):
+    try:
+        AdminService.validate(admin)
+    except HTTPException as e:
+        return (AdminHTML.LOGIN, {"hide_nav": True, "error": f"{e.detail}"})
+    
+    return {"deleted": deleted, "email": admin.email}
 
 @router.get("/users")
+@template(AdminHTML.USERS)
 def admin_users(request: Request,
-                token: str = Cookie(None, alias="admin_token"),
+                admin: User = Depends(get_current_user_cookie),
                 db: Session = Depends(get_db)):
     try:
-        AdminService.validate(token, db)
-    except HTTPException:
-        return templates.TemplateResponse("admin/login.html", {"request": request, "error": "Login again to continue"})
-    
+        AdminService.validate(admin)
+    except HTTPException as e:
+        return (AdminHTML.LOGIN, {"hide_nav": True, "error": f"{e.detail}"})
+
     users = get_all_users(db)
     unverified_users = get_expired_users(db)
 
-    return templates.TemplateResponse("admin/users.html", {"request": request, "users": users, "unverified_users": unverified_users})
+    return {"users": users, "unverified_users": unverified_users}
 
 @router.post("/cleanup-unverified")
-def cleanup_unverified_users(token: str = Cookie(None, alias="admin_token"),
+def cleanup_unverified_users(request: Request,
+                              admin: User = Depends(get_current_user_cookie),
                               db: Session = Depends(get_db)):
-    AdminService.validate(token, db)
-
     expired_users = get_expired_users(db)
     deleted_count: int = len(expired_users)
+
+    try:
+        AdminService.validate(admin)
+    except HTTPException as e:
+        return (AdminHTML.LOGIN, {"hide_nav": True, "error": f"{e.detail}"})
 
     for user in expired_users:
         db.delete(user)
@@ -73,19 +86,20 @@ def cleanup_unverified_users(token: str = Cookie(None, alias="admin_token"),
     return RedirectResponse(f"/admin/panel?deleted={deleted_count}", status_code=HTTP_302_FOUND)
 
 @router.get("/users/{user_id}")
+@template(AdminHTML.USERS_DETAILS)
 def admin_user_detail(user_id: int, request: Request,
-                      token: str = Cookie(None, alias="admin_token"),db: Session = Depends(get_db)):
+                      admin: User = Depends(get_current_user_cookie),db: Session = Depends(get_db)):
     try:
-        AdminService.validate(token, db)
-    except HTTPException:
-        return templates.TemplateResponse("admin/login.html", {"request": request, "error": "Login again to continue"})
-
+        AdminService.validate(admin)
+    except HTTPException as e:
+        return (AdminHTML.LOGIN, {"hide_nav": True, "error": f"{e.detail}"})
+    
     user = get_user_by_id(user_id, db)
 
     if not user:
         raise user_not_found
 
-    return templates.TemplateResponse("admin/user_detail.html", {"request": request, "user": user})
+    return {"user": user}
 
 @router.get("/logout")
 def admin_logout():

@@ -8,7 +8,11 @@ from src.api.routes import wallet as wallet_routes
 from src.api.routes import cleanup as jobs_routes
 from src.api.routes import cards as card_routes
 from src.api.routes import admin as admin_routes
-from src.core.config import settings
+from typing import AsyncGenerator, Any
+
+# async def lifespan(app: FastAPI) -> AsyncGenerator[None, Any, None]:
+    
+#     yield
 
 class BackendApp(FastAPI):
     def __init__(self):

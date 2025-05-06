@@ -24,10 +24,12 @@ class AdminService(BaseUserService):
         return BaseUserService.login(user_data, db)
     
     @staticmethod
-    def validate(token: str, db: Session):
-        if not token:
-            raise credentials_exception()
-
-        current_user: User = get_current_user_cookie(token, db)
-
-        return current_user
+    def validate(admin: User | str) -> None:
+        reason: str = "Invalid Credentials"
+        if isinstance(admin, str):
+            reason = admin
+            raise credentials_exception(reason)
+        
+        if isinstance(admin, User):
+            if not (admin and admin.is_superuser):
+                raise credentials_exception(reason)

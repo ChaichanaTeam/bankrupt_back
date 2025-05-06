@@ -3,11 +3,12 @@ from passlib.context import CryptContext
 from src.schemas.user import UserCreate, UserLogin, UserTemp
 from src.models.user import User, UnverifiedUser
 from src.models.wallet import Wallet
-from src.db.queries import is_user_existing, is_code_valid, get_unverified_user, get_user_by_email
+from src.db.queries import is_user_existing, is_code_valid, get_unverified_user, get_user_by_email, get_wallet
 from src.api.utils.auth import create_access_token, create_verification_code
 from src.api.utils.mail import send_verification_email
 from src.core.exceptions import user_exists_exception, code_verification_exception, credentials_exception
 from src.services.base_user import BaseUserService
+from typing import Any
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -85,3 +86,18 @@ class UserService(BaseUserService):
         db.add(new_wallet)
         db.commit()
         db.refresh(new_wallet)
+
+    @staticmethod
+    def get_user_base_data(user: User, db: Session) -> dict[str, Any]:
+        if not user:
+            raise credentials_exception()
+        
+        wallet: Wallet = get_wallet(user, db)
+
+        data = {
+                "name": user.first_name,
+                "surname": user.last_name,
+                "balance": wallet.balance
+                }
+
+        return data
