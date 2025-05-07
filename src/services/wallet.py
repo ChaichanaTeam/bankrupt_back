@@ -1,10 +1,10 @@
 import random
 from datetime import datetime, timedelta
-from src.models.cards import Card
 from sqlalchemy import exists
 from sqlalchemy.orm import Session
 from src.models.wallet import Wallet
 from src.models.user import User
+from src.models.cards import Card
 from src.models.wallet_history import TransferHistory
 from src.core.exceptions import user_not_found, forbidden_wallet_action
 from src.db.queries import get_user_by_email, get_wallet, get_user_by_id, get_transfer_records_of_id
@@ -59,8 +59,8 @@ class WalletService:
             to_user = get_user_by_id(record.to_user_id)
 
             result.append({
-                "from_email": from_user.email if from_user else "Unknown",
-                "to_email": to_user.email if to_user else "Unknown",
+                "From": from_user.email if from_user else "Unknown",
+                "To": to_user.email if to_user else "Unknown",
                 "amount": record.amount,
                 "time": record.time.strftime("%Y-%m-%d %H:%M:%S")
             })

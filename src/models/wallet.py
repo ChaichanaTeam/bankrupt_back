@@ -6,8 +6,7 @@ class Wallet(Base):
     __tablename__ = 'wallets'
 
     id: Column = Column(Integer, primary_key=True, index=True)
-    balance: Column = Column(Float, default = 0.0)
-
     user_id = Column(Integer, ForeignKey('users.id'))
 
-    users = relationship('User', back_populates='wallets')
+    user = relationship('User', back_populates='wallets')
+    cards = relationship("Card", back_populates="wallet")

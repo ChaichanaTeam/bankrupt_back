@@ -4,6 +4,7 @@ from sqlalchemy import exists, select
 from src.schemas.user import UserCreate, UserLogin
 from src.schemas.token import Token
 from src.models.wallet import Wallet
+from typing import Optional
 from src.models.wallet_history import TransferHistory
 from src.models.cards import Card
 from src.models.user import User, UnverifiedUser 
@@ -29,6 +30,14 @@ def get_unverified_user(email: str, db: Session) -> UnverifiedUser:
 def get_user_by_email(email: str, db: Session) -> User:
     return db.query(User).filter(User.email == email).first()
 
+def get_user_by_card_number(db: Session, card_number: str) -> Optional[User]:
+    return(
+        db.query(User)
+        .join(Wallet, User.id == Wallet.user_id)
+        .join(Card, Wallet.id == Card.wallet_id)
+        .filter(Card.number == card_number).first()
+    )
+
 def get_user_by_id(id: int, db: Session) -> User:
     return db.query(User).filter(User.id == id).first()
 
@@ -40,6 +49,13 @@ def is_code_valid(email: str, code: str, db: Session) -> bool:
 
 def get_wallet(user: User, db: Session) -> Wallet:
     return db.query(Wallet).filter(Wallet.user_id == user.id).first()
+
+def get_card(user: User, db: Session) -> Card:
+    return (
+        db.query(Card)
+        .join(Wallet, Card.wallet_id == Wallet.id)
+        .filter(Wallet.user_id == user.id).first()
+    )
 
 def get_transfer_records_of_id(id: int, db: Session):
     return db.query(TransferHistory).filter(
