@@ -4,7 +4,7 @@ from src.models.user import User
 from src.schemas.wallet import TransferRequest
 from src.db.dependencies import get_db
 from src.api.utils.auth import get_current_user
-from src.services.wallet import WalletService
+# from src.services.wallet import WalletService
 from src.services.transfer import TransferService
 
 router: APIRouter = APIRouter()
@@ -26,8 +26,8 @@ def get_balance(user: User = Depends(get_current_user), db: Session = Depends(ge
     return { "Balance": balance }
 
 #
-# @router.get("/wallet/history")
-# def get_transfer_history(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-#     records = WalletService.get_transfer_history_logic(user, db)
-#
-#     return records
+@router.get("/card/history")
+def get_transfer_history(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    records = TransferService.get_transfer_history_logic(user, db)
+
+    return records

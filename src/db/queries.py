@@ -63,6 +63,17 @@ def get_transfer_records_of_id(id: int, db: Session):
             (TransferHistory.to_user_id == id)
         ).order_by(TransferHistory.time.desc()).all()
 
+def get_card_transfer_history_records(card: Card, db: Session) -> list[TransferHistory]:
+    return (
+        db.query(TransferHistory)
+        .filter(
+            (TransferHistory.from_user_card_number == card.number) |
+            (TransferHistory.to_user_card_number == card.number)
+        )
+        .order_by(TransferHistory.time.desc())
+        .all()
+    )
+
 def is_superuser(id: int, db: Session) -> bool:
     return db.query(exists().where(
         (User.id == id) &

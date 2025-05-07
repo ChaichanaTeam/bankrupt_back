@@ -4,7 +4,7 @@ from src.models.user import User
 from src.models.cards import Card
 from src.models.wallet_history import TransferHistory
 from src.core.exceptions import user_not_found, forbidden_wallet_action, card_not_found
-from src.db.queries import get_card, get_user_by_card_number
+from src.db.queries import get_card, get_user_by_card_number, get_card_transfer_history_records
 
 
 class TransferService:
@@ -27,8 +27,10 @@ class TransferService:
         receiver_card.balance += transfer.amount
 
         history_record = TransferHistory(
-            from_user_id=user.id,
-            to_user_id=receiver.id,
+            from_user_card_number = sender_card.number,
+            from_user=f"{sender_card.cardholder_name} {sender_card.cardholder_surname}",
+            to_user_card_number=receiver_card.number,
+            to_user=f"{receiver_card.cardholder_name} {receiver_card.cardholder_surname}",
             amount=transfer.amount
         )
 
@@ -47,20 +49,26 @@ class TransferService:
 
         return card.balance
 
-    # @staticmethod
-    # def get_transfer_history_logic(user: User, db: Session) -> dict[str, list]:
-    #     records = get_transfer_records_of_id
-    #
-    #     result = []
-    #     for record in records:
-    #         from_user = get_user_by_id(record.from_user_id)
-    #         to_user = get_user_by_id(record.to_user_id)
-    #
-    #         result.append({
-    #             "From": from_user.email if from_user else "Unknown",
-    #             "To": to_user.email if to_user else "Unknown",
-    #             "amount": record.amount,
-    #             "time": record.time.strftime("%Y-%m-%d %H:%M:%S")
-    #         })
-    #
-    #     return {"history": result}
+    @staticmethod
+    def get_transfer_history_logic(user: User, db: Session) -> dict[str, list]:
+        card = get_card(user, db)
+        if not card:
+            return {"history": []}
+
+        records = get_card_transfer_history_records(card, db)
+
+        result = []
+        for record in records:
+            direction = (
+                "out" if record.from_user_card_number == card.number else "in"
+            )
+
+            result.append({
+                "direction": direction,
+                "from": record.from_user,
+                "to": record.to_user,
+                "amount": record.amount,
+                "time": record.time.isoformat()
+            })
+
+        return {"history": result}
