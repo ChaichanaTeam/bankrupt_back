@@ -71,17 +71,12 @@ def admin_users(request: Request,
 def cleanup_unverified_users(request: Request,
                               admin: User = Depends(get_current_user_cookie),
                               db: Session = Depends(get_db)):
-    expired_users = get_expired_users(db)
-    deleted_count: int = len(expired_users)
-
     try:
         AdminService.validate(admin)
     except HTTPException as e:
         return (AdminHTML.LOGIN, {"hide_nav": True, "error": f"{e.detail}"})
 
-    for user in expired_users:
-        db.delete(user)
-    db.commit()
+    deleted_count: int = AdminService.cleanup_users(db)
 
     return RedirectResponse(f"/admin/panel?deleted={deleted_count}", status_code=HTTP_302_FOUND)
 

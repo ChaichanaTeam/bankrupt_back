@@ -10,6 +10,10 @@ user_exists_exception: HTTPException = HTTPException(
     detail="User already exists"
 )
 
+def bad_requset(reason: str = "Bad Request") -> HTTPException:
+    return HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                         detail=reason)
+
 code_verification_exception: HTTPException = HTTPException(
     status_code=status.HTTP_406_NOT_ACCEPTABLE,
     detail="Wrong code"

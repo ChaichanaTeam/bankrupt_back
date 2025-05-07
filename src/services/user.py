@@ -6,8 +6,9 @@ from src.models.wallet import Wallet
 from src.db.queries import is_user_existing, is_code_valid, get_unverified_user, get_user_by_email, get_wallet
 from src.api.utils.auth import create_access_token, create_verification_code
 from src.api.utils.mail import send_verification_email
-from src.core.exceptions import user_exists_exception, code_verification_exception, credentials_exception
+from src.core.exceptions import user_exists_exception, code_verification_exception, credentials_exception, bad_requset
 from src.services.base_user import BaseUserService
+from src.core.traceback import traceBack, TrackType
 from typing import Any
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -45,12 +46,18 @@ class UserService(BaseUserService):
             phone_number=user.phone_number,
             code=verification_code
         )
-
+        
         db.add(temp_user)
+
+        try:
+            send_verification_email(temp_user.email, verification_code)
+        except Exception as e:
+            traceBack(f"{e}", type=TrackType.ERROR)
+            db.rollback()
+            raise bad_requset()
+
         db.commit()
         db.refresh(temp_user)
-
-        send_verification_email(temp_user.email, verification_code)
 
     @staticmethod
     def verify_email(user_data: UserCreate, db: Session):

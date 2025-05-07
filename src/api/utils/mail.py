@@ -1,6 +1,10 @@
 import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from email.message import EmailMessage
 from src.core.config import settings
+from pathlib import Path
+from src.core.traceback import traceBack, TrackType
 
 class EmailServer:
     def __init__(self):
@@ -18,7 +22,7 @@ class EmailServer:
         except:
             return False
 
-    def send_message(self, msg: EmailMessage) -> None:
+    def send_message(self, msg: EmailMessage | MIMEMultipart) -> None:
         if self.smtp is None or not self.is_connected():
             self.connect()
         try:
@@ -39,16 +43,18 @@ class EmailServer:
 email_service: EmailServer = EmailServer()
 
 def send_verification_email(email: str, code: str) -> None:
-    msg: EmailMessage = EmailMessage()
-    msg["Subject"] = "Email verification"
-    msg["From"] = settings.EMAIL
-    msg["To"] = email
+    template = settings.TEMPLATES.get_template("email/code.html")
+    css = Path("src/static/styles/email.css").read_text()
 
-    msg.set_content(
-        f"Hi!\n\nThis is your verification code: {code}"
-    )
+    message = MIMEMultipart("alternative")
+    message["Subject"] = "Email verification"
+    message["From"] = settings.EMAIL
+    message["To"] = email
+
+    mime_html = MIMEText(template.render(CONFIRMATION_CODE=code, INLINE_CSS=css), "html")
+    message.attach(mime_html)
 
     try:
-        email_service.send_message(msg)
+        email_service.send_message(message)
     except Exception as e:
-        print(f"Mail has not been sended: {e}")
+        traceBack(f"Mail has not been sended: {e}", type=TrackType.ERROR)
