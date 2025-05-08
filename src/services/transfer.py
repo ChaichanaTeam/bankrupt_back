@@ -42,12 +42,19 @@ class TransferService:
         return history_record
 
     @staticmethod
-    def get_balance_logic(user: User, db: Session) -> float:
+    def get_card_info_logic(user: User, db: Session) -> float:
         card = get_card(user, db)
         if not card:
             raise user_not_found
 
-        return card.balance
+        return {
+            "number": card.number,
+            "cardholder_name": card.cardholder_name,
+            "cardholder_surname": card.cardholder_surname,
+            "expiration_date": card.expiration_date,
+            "cvv": card.cvv,
+            "balance": card.balance
+        }
 
     @staticmethod
     def get_transfer_history_logic(user: User, db: Session) -> dict[str, list]:

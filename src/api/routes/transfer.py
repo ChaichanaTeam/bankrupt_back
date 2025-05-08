@@ -16,16 +16,16 @@ def transfer_money(transfer: TransferRequest,
     TransferService.transfer_money_logic(transfer, db, user)
 
     return {
-        "message": f"Transferred {transfer.amount}"
+        f"Transferred {transfer.amount}"
     }
 
 @router.get("/card")
-def get_balance(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    balance = TransferService.get_balance_logic(user, db)
+def get_card_info(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    info = TransferService.get_card_info_logic(user, db)
 
-    return { "Balance": balance }
+    return info
 
-#
+
 @router.get("/card/history")
 def get_transfer_history(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     records = TransferService.get_transfer_history_logic(user, db)
