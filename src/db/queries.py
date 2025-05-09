@@ -54,7 +54,7 @@ def get_card(user: User, db: Session) -> Card:
     return (
         db.query(Card)
         .join(Wallet, Card.wallet_id == Wallet.id)
-        .filter(Wallet.user_id == user.id).first()
+        .filter(Wallet.user_id == user.id).all()
     )
 
 def get_transfer_records_of_id(id: int, db: Session):

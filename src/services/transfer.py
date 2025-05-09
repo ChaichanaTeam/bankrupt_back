@@ -43,18 +43,21 @@ class TransferService:
 
     @staticmethod
     def get_card_info_logic(user: User, db: Session) -> float:
-        card = get_card(user, db)
-        if not card:
+        cards = get_card(user, db)
+        if not cards:
             raise user_not_found
 
-        return {
-            "number": card.number,
-            "cardholder_name": card.cardholder_name,
-            "cardholder_surname": card.cardholder_surname,
-            "expiration_date": card.expiration_date,
-            "cvv": card.cvv,
-            "balance": card.balance
-        }
+        return [
+            {
+                "number": card.number,
+                "cardholder_name": card.cardholder_name,
+                "cardholder_surname": card.cardholder_surname,
+                "expiration_date": card.expiration_date,
+                "cvv": card.cvv,
+                "balance": card.balance
+            }
+            for card in cards
+        ]
 
     @staticmethod
     def get_transfer_history_logic(user: User, db: Session) -> dict[str, list]:
