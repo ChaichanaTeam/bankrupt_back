@@ -10,3 +10,4 @@ class Wallet(Base):
 
     user = relationship('User', back_populates='wallets')
     cards = relationship("Card", back_populates="wallet")
+    saving_account = relationship("Saving_account", back_populates="wallet")

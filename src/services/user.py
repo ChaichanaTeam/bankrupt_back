@@ -1,14 +1,13 @@
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
-from src.schemas.user import UserCreate, UserLogin, UserTemp
+from src.schemas.user import UserCreate, UserTemp
 from src.models.user import User, UnverifiedUser
 from src.models.wallet import Wallet
-from src.db.queries import is_user_existing, is_code_valid, get_unverified_user, get_user_by_email, get_wallet
-from src.api.utils.auth import create_access_token, create_verification_code
+from src.db.queries import is_user_existing, is_code_valid, get_unverified_user
+from src.api.utils.auth import create_verification_code
 from src.api.utils.mail import send_verification_email
-from src.models.cards import Card
-from src.db.queries import get_card, get_user_by_card_number
-from src.core.exceptions import user_not_found, forbidden_wallet_action, card_not_found
+from src.db.queries import get_cards
+from src.core.exceptions import user_not_found
 from src.core.exceptions import user_exists_exception, code_verification_exception, credentials_exception, bad_requset
 from src.services.base_user import BaseUserService
 from src.core.traceback import traceBack, TrackType
@@ -103,7 +102,7 @@ class UserService(BaseUserService):
             raise credentials_exception()
         
         # wallet: Wallet = get_wallet(user, db)
-        card = get_card(user, db)
+        card = get_cards(user, db)
         if not card:
             raise user_not_found
 
