@@ -4,10 +4,11 @@ from sqlalchemy import exists, select
 from src.schemas.user import UserCreate, UserLogin
 from src.schemas.token import Token
 from src.models.wallet import Wallet
-from typing import Optional
 from src.models.wallet_history import TransferHistory
 from src.models.cards import Card
-from src.models.user import User, UnverifiedUser 
+from src.models.user import User, UnverifiedUser
+from src.models.savings import Saving_account
+from typing import Optional
 
 def is_user_existing(user: UserCreate, db: Session) -> bool:
     return db.query(exists().where(
@@ -57,6 +58,30 @@ def get_cards(user: User, db: Session) -> list[Card]:
         .filter(Wallet.user_id == user.id).all()
     )
 
+def get_card_by_id(user: User, card_id: int, db: Session) -> Optional[Card]:
+    return (
+        db.query(Card)
+        .join(Wallet, Card.wallet_id == Wallet.id)
+        .filter(
+            Wallet.user_id == user.id,
+            Card.id == card_id
+        )
+        .first()
+    )
+
+
+def get_card_by_number(user: User, card_number: str, db: Session) -> Optional[Card]:
+    return(
+        db.query(Card)
+        .join(Wallet, Card.wallet_id == Wallet.id)
+        .filter(
+            Wallet.user_id == user.id,
+            Card.number == card_number
+        )
+        .first()
+    )
+
+
 def get_transfer_records_of_id(id: int, db: Session):
     return db.query(TransferHistory).filter(
             (TransferHistory.from_user_id == id) |
@@ -65,13 +90,29 @@ def get_transfer_records_of_id(id: int, db: Session):
 
 def get_card_transfer_history_records(card: Card, db: Session) -> list[TransferHistory]:
     return (
-        db.query(TransferHistory)
-        .filter(
+        db.query(TransferHistory).filter(
             (TransferHistory.from_user_card_number == card.number) |
             (TransferHistory.to_user_card_number == card.number)
         )
         .order_by(TransferHistory.time.desc())
         .all()
+    )
+
+def get_saving_accounts(user: User, db: Session):
+    return(
+        db.query(Saving_account).join(Wallet, Saving_account.wallet_id == Wallet.id)
+        .filter(Wallet.user_id == user.id).all()
+    )
+
+def get_saving_account_by_id(user: User, account_id: int, db: Session) -> Optional[Saving_account]:
+    return (
+        db.query(Saving_account)
+        .join(Wallet, Saving_account.wallet_id == Wallet.id)
+        .filter(
+            Wallet.user_id == user.id,
+            Saving_account.id == account_id
+        )
+        .first()
     )
 
 def is_superuser(id: int, db: Session) -> bool:
