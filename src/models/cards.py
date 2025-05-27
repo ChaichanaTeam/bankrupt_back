@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Date, TIMESTAMP, text, Boolean, ForeignKey, Float
 from sqlalchemy.orm import relationship
 from src.db.base import Base
+from typing import Any
 
 class Card(Base):
     __tablename__ = 'cards'
@@ -16,3 +17,13 @@ class Card(Base):
     wallet_id: Column = Column(Integer, ForeignKey('wallets.id'), nullable=False)
 
     wallet = relationship("Wallet", back_populates="cards")
+
+    def json(self) -> dict[str, Any]:
+        return {
+            "cardholer_name": self.cardholder_name,
+            "cardholer_surname": self.cardholder_surname,
+            "number": self.number,
+            "expiration_date": self.expiration_date,
+            "cvv": self.cvv,
+            "balance": self.balance
+        }

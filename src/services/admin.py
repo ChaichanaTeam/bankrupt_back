@@ -19,7 +19,8 @@ class AdminService(BaseUserService):
         try:
             if not is_superuser(get_user_by_email(user_data.email, db).id, db):
                 raise credentials_exception()
-        except Exception:
+        except Exception as e:
+            print(e)
             raise credentials_exception()
             
         return BaseUserService.login(user_data, db)

@@ -50,7 +50,7 @@ def is_code_valid(email: str, code: str, db: Session) -> bool:
 def get_wallet(user: User, db: Session) -> Wallet:
     return db.query(Wallet).filter(Wallet.user_id == user.id).first()
 
-def get_card(user: User, db: Session) -> Card:
+def get_cards(user: User, db: Session) -> list[Card]:
     return (
         db.query(Card)
         .join(Wallet, Card.wallet_id == Wallet.id)

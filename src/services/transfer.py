@@ -4,8 +4,7 @@ from src.models.user import User
 from src.models.cards import Card
 from src.models.wallet_history import TransferHistory
 from src.core.exceptions import user_not_found, forbidden_wallet_action, card_not_found
-from src.db.queries import get_card, get_user_by_card_number, get_card_transfer_history_records
-
+from src.db.queries import get_cards, get_user_by_card_number, get_card_transfer_history_records
 
 class TransferService:
     @staticmethod
@@ -14,8 +13,8 @@ class TransferService:
         if not receiver:
             raise user_not_found
 
-        sender_card: Card = get_card(user, db)
-        receiver_card: Card = get_card(receiver, db)
+        sender_card: Card = get_cards(user, db)
+        receiver_card: Card = get_cards(receiver, db)
 
         if not sender_card or not receiver_card:
             raise card_not_found
@@ -42,26 +41,18 @@ class TransferService:
         return history_record
 
     @staticmethod
-    def get_card_info_logic(user: User, db: Session) -> float:
-        cards = get_card(user, db)
+    def get_card_info_logic(user: User, db: Session):
+        cards = get_cards(user, db)
         if not cards:
             raise user_not_found
 
         return [
-            {
-                "number": card.number,
-                "cardholder_name": card.cardholder_name,
-                "cardholder_surname": card.cardholder_surname,
-                "expiration_date": card.expiration_date,
-                "cvv": card.cvv,
-                "balance": card.balance
-            }
-            for card in cards
+            card.json() for card in cards
         ]
 
     @staticmethod
     def get_transfer_history_logic(user: User, db: Session) -> dict[str, list]:
-        card = get_card(user, db)
+        card = get_cards(user, db)
         if not card:
             return {"history": []}
 

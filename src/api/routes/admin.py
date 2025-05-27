@@ -17,6 +17,11 @@ from src.core.traceback import traceBack, TrackType
 
 router: APIRouter = APIRouter()
 
+@router.get("/")
+@template(None)
+def admin_redirect(request: Request):
+    return (AdminHTML.LOGIN, {"hide_nav": True, "error": None})
+
 @router.get("/login")
 @template(AdminHTML.LOGIN)
 def admin_login_gui(request: Request) -> dict[str, Any]:
