@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from src.schemas.user import UserCreate, UserLogin, UserTemp, AvailabilityRequest
+from src.schemas.user import UserCreate, UserLogin, UserTemp, AvailabilityRequest, UserPasswordReset
 from src.schemas.token import Token
 from src.db.dependencies import get_db
 from src.services.user import UserService
@@ -32,6 +32,12 @@ def login(user_data: UserLogin, db: Session = Depends(get_db)):
 def get_user_base_data(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     return UserService.get_user_base_data(user, db)
 
-## TODO login 2FA
+@router.post("/reset")
+def reset_password_request(user_reset: UserTemp, db: Session = Depends(get_db)):
+    return UserService.reset_password_request(user_reset, db)
 
-## Password reset
+@router.patch("/reset")
+def reset_password_confirm(password_form: UserPasswordReset, db: Session = Depends(get_db)):
+    return UserService.reset_password_confirm(password_form, db)
+
+## TODO login 2FA

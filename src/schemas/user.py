@@ -28,3 +28,7 @@ class AvailabilityRequest(BaseModel):
 class UserLogin(BaseModel):
     email: str
     password: str
+
+class UserPasswordReset(BaseModel):
+    token: str
+    new_password: str

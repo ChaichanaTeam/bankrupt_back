@@ -24,6 +24,9 @@ class User(Base):
     last_2fa_code: Column = Column(String, nullable=True, default=None)
     expires_at_2fa: Column = Column(TIMESTAMP, nullable=True, default=None)
 
+    reset_token: Column = Column(String, nullable=True, default=None)
+    reset_token_created_at: Column = Column(TIMESTAMP(timezone=True), nullable=True, default=None)
+
     is_superuser: Column = Column(Boolean, default=False)
 
     wallets = relationship("Wallet", back_populates="user")

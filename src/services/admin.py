@@ -7,7 +7,7 @@ from src.db.queries import get_expired_users
 from src.models.wallet import Wallet
 from src.db.queries import is_superuser, get_user_by_email
 from src.api.utils.auth import create_access_token, create_verification_code, get_current_user_cookie
-from src.api.utils.mail import send_verification_email
+from src.api.utils.mail import send_email
 from src.core.exceptions import credentials_exception
 from src.services.base_user import BaseUserService
 

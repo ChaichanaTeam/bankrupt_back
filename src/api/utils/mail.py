@@ -5,6 +5,12 @@ from email.message import EmailMessage
 from src.core.config import settings
 from pathlib import Path
 from src.core.traceback import traceBack, TrackType
+from enum import StrEnum
+
+class EmailType(StrEnum):
+    REGISTRATION = "email/code.html"
+    PASSWORD_RESET = "email/reset.html"
+
 
 class EmailServer:
     def __init__(self):
@@ -42,16 +48,23 @@ class EmailServer:
 
 email_service: EmailServer = EmailServer()
 
-def send_verification_email(email: str, code: str) -> None:
-    template = settings.TEMPLATES.get_template("email/code.html")
+def send_email(email: str, title: str, email_type: EmailType, **kwargs) -> None:
+    template = settings.TEMPLATES.get_template(str(email_type))
     css = Path("src/static/styles/email.css").read_text()
 
     message = MIMEMultipart("alternative")
-    message["Subject"] = "Email verification"
+    message["Subject"] = title
     message["From"] = settings.EMAIL
     message["To"] = email
 
-    mime_html = MIMEText(template.render(CONFIRMATION_CODE=code, INLINE_CSS=css), "html")
+    code = kwargs.get("code")
+    link = kwargs.get("link")
+
+    if code:
+        mime_html = MIMEText(template.render(CONFIRMATION_CODE=code, INLINE_CSS=css), "html")
+    elif link:
+        mime_html = MIMEText(template.render(RESET_LINK=link, INLINE_CSS=css), "html")
+
     message.attach(mime_html)
 
     try:

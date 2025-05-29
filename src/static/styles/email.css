@@ -25,6 +25,20 @@ body {
     letter-spacing: 4px;
 }
 
+.link {
+    font-size: 32px;
+    font-weight: bold;
+    background-color: black;
+    text-decoration: none;
+    color: white !important;
+    margin: 20px 0;
+    letter-spacing: 4px;
+  }
+
+.link:link{
+    color: white !important;
+}
+
 .footer {
     margin-top: 30px;
     font-size: 12px;

@@ -1,4 +1,4 @@
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, timezone
 from sqlalchemy.orm import Session
 from sqlalchemy import exists, select
 from src.schemas.user import UserCreate, UserLogin
@@ -22,7 +22,7 @@ def is_user_existing(user: UserCreate, db: Session) -> bool:
         (UnverifiedUser.phone_number == user.phone_number)
     )).scalar()
 
-def get_expired_users(db: Session, threshold: datetime = datetime.now()) -> list[UnverifiedUser]:
+def get_expired_users(db: Session, threshold: datetime = datetime.now(timezone.utc)) -> list[UnverifiedUser]:
     return db.query(UnverifiedUser).filter(UnverifiedUser.created_at < threshold).all()
 
 def get_unverified_user(email: str, db: Session) -> UnverifiedUser:

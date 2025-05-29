@@ -1,11 +1,11 @@
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
-from src.schemas.user import UserCreate, UserTemp
+from src.schemas.user import UserCreate, UserTemp, UserPasswordReset
 from src.models.user import User, UnverifiedUser
 from src.models.wallet import Wallet
 from src.db.queries import is_user_existing, is_code_valid, get_unverified_user
 from src.api.utils.auth import create_verification_code
-from src.api.utils.mail import send_verification_email
+from src.api.utils.mail import send_email, EmailType
 from src.models.cards import Card
 from src.db.queries import get_cards, get_user_by_card_number
 from src.core.exceptions import user_not_found, forbidden_wallet_action, card_not_found
@@ -13,6 +13,10 @@ from src.core.exceptions import user_exists_exception, code_verification_excepti
 from src.services.base_user import BaseUserService
 from src.core.traceback import traceBack, TrackType
 from typing import Any
+from secrets import token_urlsafe
+from src.core.config import settings
+from urllib.parse import urljoin, urlencode
+from datetime import datetime, timedelta, timezone
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -53,7 +57,7 @@ class UserService(BaseUserService):
         db.add(temp_user)
 
         try:
-            send_verification_email(temp_user.email, verification_code)
+            send_email(temp_user.email, "Email Verification", EmailType.REGISTRATION, code=verification_code)
         except Exception as e:
             traceBack(f"{e}", type=TrackType.ERROR)
             db.rollback()
@@ -114,3 +118,51 @@ class UserService(BaseUserService):
                 }
 
         return data
+    
+    @staticmethod
+    def reset_password_request(user_reset: UserTemp, db: Session) -> dict[str, Any]:
+        user: User = db.query(User).filter(User.email == user_reset.email,
+                                     User.social_security == user_reset.social_security,
+                                     User.phone_number == user_reset.phone_number).first()
+
+        if user is None:
+            raise credentials_exception()
+        
+        reset_token: str = token_urlsafe(32)
+
+        while db.query(User).filter(User.reset_token == reset_token).count() > 0:
+            reset_token: str = token_urlsafe(32)
+        
+        user.reset_token = reset_token
+        user.reset_token_created_at = datetime.now(timezone.utc)
+        base_url: str = None
+
+        if settings.IS_DEPLOYED:
+            base_url = settings.ORIGINS[-1]
+        else:
+            base_url = settings.ORIGINS[0]
+            
+        link = urljoin(base_url, "/reset") + "?" + urlencode({"token": user.reset_token})
+
+        send_email(user.email, "Password reset", EmailType.PASSWORD_RESET, link=link)
+
+        db.commit()
+        db.refresh(user)
+
+        return {"message": "Email sended"}
+
+    @staticmethod
+    def reset_password_confirm(password_form: UserPasswordReset, db: Session) -> dict[str, Any]:
+        user: User = db.query(User).filter(User.reset_token == password_form.token).first()
+
+        # or (datetime.now(timezone.utc) - user.reset_token_created_at) > timedelta(hours=1) NOT WORKING
+        if user is None:
+            raise credentials_exception("Reset token is not valid")
+
+        user.hashed_password = pwd_context.hash(password_form.new_password)
+        user.reset_token = None
+        user.reset_token_created_at = None
+        db.commit()
+        db.refresh(user)
+
+        return {"message": "Password changed"}

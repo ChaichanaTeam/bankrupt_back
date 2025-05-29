@@ -1,5 +1,5 @@
 import random
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from sqlalchemy import exists
 from sqlalchemy.orm import Session
 from src.db.queries import get_wallet
@@ -19,7 +19,7 @@ def generate_cvv():
     return ''.join(str(random.randint(0, 9)) for _ in range(3))
 
 def generate_expiration_date():
-    future_date = datetime.now() + timedelta(days=365 * 5)
+    future_date = datetime.now(timezone.utc) + timedelta(days=365 * 5)
     return future_date.strftime("%m/%y")
 
 class CardsService:
