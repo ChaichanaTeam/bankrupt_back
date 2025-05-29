@@ -15,3 +15,6 @@ class TransferRequest(BaseModel):
 
 class CardHistoryRequest(BaseModel):
     card_number: str
+
+class CardDelete(BaseModel):
+    card_number: str

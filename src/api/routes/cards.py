@@ -25,6 +25,13 @@ def create_card(user: User = Depends(get_current_user), db: Session = Depends(ge
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+def delete_card(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    try:
+        card = CardsService.delete_card_logic(user, db)
+        return {"deleted": True}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
 @router.post("/transfer")
 def transfer_money(transfer: TransferRequest,
                    db: Session = Depends(get_db),
