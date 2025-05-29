@@ -49,6 +49,20 @@ class CardsService:
         return card.json()
 
     @staticmethod
+    def delete_card_logic(user: User, db: Session) -> dict:
+        card = get_card_by_number(user, card_number, db)
+        if not card:
+            raise card_not_found
+
+        if card.balance > 0:
+            raise forbidden_wallet_action
+
+        db.delete(card)
+        db.commit()
+        db.refresh(card)
+
+
+    @staticmethod
     def transfer_money_logic(transfer, db: Session, user: User):
         receiver = get_user_by_card_number(db, transfer.to_card_number)
         if not receiver:
