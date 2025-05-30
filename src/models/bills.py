@@ -8,7 +8,7 @@ class Bills(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String)
-    user_id = Column(Integer, ForeignKey("wallets.id"), nullable=False)
     amount = Column(Float, nullable=False)
     due_date = Column(DateTime, nullable=False)
     paid = Column(Boolean, default=False)
+    wallet_id = Column(Integer, ForeignKey("wallets.id"), nullable=False)

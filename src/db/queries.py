@@ -8,6 +8,7 @@ from src.models.wallet_history import TransferHistory
 from src.models.cards import Card
 from src.models.user import User, UnverifiedUser
 from src.models.savings import Saving_account
+from src.models.bills import Bills
 from typing import Optional
 
 def is_user_existing(user: UserCreate, db: Session) -> bool:
@@ -112,6 +113,13 @@ def get_saving_account_by_id(user: User, account_id: int, db: Session) -> Option
             Wallet.user_id == user.id,
             Saving_account.id == account_id
         )
+        .first()
+    )
+
+def get_bill_by_id(user, bill_id: int, db: Session):
+    return (
+        db.query(Bills)
+        .filter(Bills.id == bill_id, Bills.wallet_id == get_wallet(user, db).id)
         .first()
     )
 
