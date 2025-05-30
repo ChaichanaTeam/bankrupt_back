@@ -154,9 +154,8 @@ class UserService(BaseUserService):
     @staticmethod
     def reset_password_confirm(password_form: UserPasswordReset, db: Session) -> dict[str, Any]:
         user: User = db.query(User).filter(User.reset_token == password_form.token).first()
-
-        # or (datetime.now(timezone.utc) - user.reset_token_created_at) > timedelta(hours=1) NOT WORKING
-        if user is None:
+        
+        if user is None or (datetime.now(timezone.utc) - user.reset_token_created_at.replace(tzinfo=timezone.utc) > timedelta(hours=1)):
             raise credentials_exception("Reset token is not valid")
 
         user.hashed_password = pwd_context.hash(password_form.new_password)
