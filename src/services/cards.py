@@ -6,7 +6,7 @@ from src.db.queries import get_wallet
 from src.models.user import User
 from src.models.cards import Card
 from src.models.wallet_history import TransferHistory
-from src.core.exceptions import user_not_found, forbidden_wallet_action, card_not_found
+from src.core.exceptions import user_not_found, forbidden_wallet_action, card_not_found, cannot_delete_card_with_balance
 from src.db.queries import get_cards, get_user_by_card_number, get_card_transfer_history_records, get_card_by_number
 
 def generate_card_number(db: Session):
@@ -49,17 +49,21 @@ class CardsService:
         return card.json()
 
     @staticmethod
-    def delete_card_logic(user: User, db: Session) -> dict:
+    def delete_card_logic(user: User, card_number:str, db: Session) -> dict:
         card = get_card_by_number(user, card_number, db)
         if not card:
             raise card_not_found
 
         if card.balance > 0:
-            raise forbidden_wallet_action
+            raise cannot_delete_card_with_balance
 
         db.delete(card)
         db.commit()
-        db.refresh(card)
+
+        return{
+            "status": "deleted",
+            "card_number": card_number
+        }
 
 
     @staticmethod

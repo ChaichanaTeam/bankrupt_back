@@ -26,3 +26,6 @@ class Saving_Account_decrease(BaseModel):
     amount: float
     saving_account_id: int
     card_id: int
+
+class Saving_Account_Delete(BaseModel):
+    saving_account_id: int

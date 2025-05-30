@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from src.models.user import User
-from src.schemas.savings import Saving_Account_creation, Saving_Account_out, Saving_Account_TopUp
+from src.schemas.savings import Saving_Account_creation, Saving_Account_out, Saving_Account_TopUp, Saving_Account_Delete
 from src.db.dependencies import get_db
 from src.api.utils.auth import get_current_user
 from src.services.savings import SavingsService
@@ -47,3 +47,11 @@ def decrease_saving_account(data: Saving_Account_TopUp, user: User = Depends(get
     return{
         f"Taken {amount}"
     }
+
+
+@router.post("/delete")
+def delete_saving_account(data: Saving_Account_Delete, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    try:
+        return SavingsService.delete_saving_account_logic(user, data.saving_account_id, db)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))

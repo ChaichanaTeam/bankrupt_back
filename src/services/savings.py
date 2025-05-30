@@ -1,6 +1,6 @@
 from sqlalchemy import exists
 from sqlalchemy.orm import Session
-from src.core.exceptions import user_not_found, forbidden_wallet_action, bad_requset
+from src.core.exceptions import user_not_found, forbidden_wallet_action, card_not_found, saving_account_not_found ,cannot_delete_saving_account_with_balance
 from src.db.queries import get_wallet, get_cards, get_card_by_id, get_saving_accounts, get_saving_account_by_id
 from src.models.user import User
 from src.models.savings import Saving_account
@@ -60,8 +60,14 @@ class SavingsService:
         saving_account = get_saving_account_by_id(user, data.saving_account_id, db)
         card = get_card_by_id(user, data.card_id, db)
 
-        if not wallet or not saving_account or not card:
+        if not wallet:
             raise user_not_found
+
+        if not card:
+            raise card_not_found
+
+        if not saving_account:
+            saving_account_not_found
 
         if card.balance < data.amount:
             raise forbidden_wallet_action("Not enough funds")
@@ -80,8 +86,14 @@ class SavingsService:
         saving_account = get_saving_account_by_id(user, data.saving_account_id, db)
         card = get_card_by_id(user, data.card_id, db)
 
-        if not wallet or not saving_account or not card:
+        if not wallet:
             raise user_not_found
+
+        if not card:
+            raise card_not_found
+
+        if not saving_account:
+            saving_account_not_found
 
         if saving_account.balance < data.amount:
             raise forbidden_wallet_action("Not enough funds")
@@ -93,3 +105,19 @@ class SavingsService:
         db.refresh(saving_account)
         db.refresh(card)
 
+    def delete_saving_account_logic(user: User, saving_account_id: int, db: Session) -> dict:
+        saving_account = get_saving_account_by_id(user, saving_account_id, db)
+
+        if not saving_account:
+            saving_account_not_found
+
+        if saving_account.balance > 0:
+            raise cannot_delete_saving_account_with_balance
+
+        db.delete(saving_account)
+        db.commit()
+
+        return {
+            "status": "deleted",
+            "saving_account_id": saving_account_id
+        }

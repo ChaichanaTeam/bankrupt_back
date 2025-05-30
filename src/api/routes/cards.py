@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from src.models.user import User
-from src.schemas.cards import TransferRequest, CardHistoryRequest
+from src.schemas.cards import TransferRequest, CardHistoryRequest, CardDelete
 from src.db.dependencies import get_db
 from src.api.utils.auth import get_current_user
 from src.db.queries import get_cards
@@ -25,12 +25,14 @@ def create_card(user: User = Depends(get_current_user), db: Session = Depends(ge
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-def delete_card(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+@router.post("/delete")
+def delete_card(card_delete: CardDelete, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     try:
-        card = CardsService.delete_card_logic(user, db)
-        return {"deleted": True}
+        result = CardsService.delete_card_logic(user, card_delete.card_number, db)
+        return result
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
 
 @router.post("/transfer")
 def transfer_money(transfer: TransferRequest,
