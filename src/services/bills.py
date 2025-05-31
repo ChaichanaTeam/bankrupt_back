@@ -1,6 +1,7 @@
 from src.models.bills import Bills
 from src.db.queries import get_wallet, get_card_by_number, get_bill_by_id
 from src.core.exceptions import user_not_found, card_not_found, forbidden_wallet_action
+from src.models.wallet_history import TransferHistory, TransactionType
 from sqlalchemy.orm import Session
 
 class BillsService:
@@ -59,6 +60,17 @@ class BillsService:
 
         card.balance -= bill.amount
         bill.paid = True
+
+        history_record = TransferHistory(
+            transfer_type=TransactionType.BILL,
+            from_user_card_number=card.number,
+            from_user=f"{card.cardholder_name} {card.cardholder_surname}",
+            to_user_card_number=None,
+            to_user=f"Bill - {bill.name}",
+            amount=bill.amount
+        )
+
+        db.add(history_record)
 
         db.commit()
         db.refresh(bill)

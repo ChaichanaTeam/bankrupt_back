@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from src.db.queries import get_wallet
 from src.models.user import User
 from src.models.cards import Card
-from src.models.wallet_history import TransferHistory
+from src.models.wallet_history import TransferHistory, TransactionType
 from src.core.exceptions import user_not_found, forbidden_wallet_action, card_not_found, cannot_delete_card_with_balance
 from src.db.queries import get_cards, get_user_by_card_number, get_card_transfer_history_records, get_card_by_number
 
@@ -85,6 +85,7 @@ class CardsService:
         receiver_card.balance += transfer.amount
 
         history_record = TransferHistory(
+            transfer_type=TransactionType.TRANSFER,
             from_user_card_number=sender_card.number,
             from_user=f"{sender_card.cardholder_name} {sender_card.cardholder_surname}",
             to_user_card_number=receiver_card.number,
@@ -135,7 +136,10 @@ class CardsService:
             result.append({
                 "direction": direction,
                 "from": record.from_user,
+                "from_card_number": record.from_user_card_number,
                 "to": record.to_user,
+                "to_card_number": record.to_user_card_number,
+                "transfer_type": record.transfer_type.name,
                 "amount": record.amount,
                 "time": record.time.isoformat()
             })

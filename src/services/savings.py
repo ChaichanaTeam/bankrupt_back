@@ -4,6 +4,7 @@ from src.core.exceptions import user_not_found, forbidden_wallet_action, card_no
 from src.db.queries import get_wallet, get_cards, get_card_by_id, get_saving_accounts, get_saving_account_by_id
 from src.models.user import User
 from src.models.savings import Saving_account
+from src.models.wallet_history import TransferHistory, TransactionType
 from src.schemas.savings import Saving_Account_creation, Saving_Account_out
 from typing import List
 
@@ -75,6 +76,17 @@ class SavingsService:
         card.balance -= data.amount
         saving_account.balance += data.amount
 
+        history_record = TransferHistory(
+            transfer_type=TransactionType.SAVINGS_TOPUP,
+            from_user_card_number=card.number,
+            from_user=f"{card.cardholder_name} {card.cardholder_surname}",
+            to_user_card_number=None,
+            to_user=f"Saving Account - {saving_account.name}",
+            amount=data.amount
+        )
+
+        db.add(history_record)
+
         db.commit()
         db.refresh(saving_account)
         db.refresh(card)
@@ -100,6 +112,17 @@ class SavingsService:
 
         card.balance += data.amount
         saving_account.balance -= data.amount
+
+        history_record = TransferHistory(
+            transfer_type=TransactionType.SAVINGS_WITHDRAW,
+            from_user_card_number=None,
+            from_user=f"Saving Account - {saving_account.name}",
+            to_user_card_number=card.number,
+            to_user=f"{card.cardholder_name} {card.cardholder_surname}",
+            amount=data.amount
+        )
+
+        db.add(history_record)
 
         db.commit()
         db.refresh(saving_account)

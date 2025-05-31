@@ -9,6 +9,8 @@ class TransactionType(Enum):
     INCOME = 1
     PURCHASE = 2
     BILL = 3
+    SAVINGS_TOPUP = 4
+    SAVINGS_WITHDRAW = 5
 
 class TransferHistory(Base):
     __tablename__ = "transfer_history"
