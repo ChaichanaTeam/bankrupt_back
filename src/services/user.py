@@ -107,14 +107,14 @@ class UserService(BaseUserService):
             raise credentials_exception()
         
         # wallet: Wallet = get_wallet(user, db)
-        card = get_cards(user, db)
+        cards = get_cards(user, db)
         if not card:
             raise user_not_found
 
         data = {
                 "name": user.first_name,
                 "surname": user.last_name,
-                "balance": card.balance
+                "cards": [card.json() for card in cards]
                 }
 
         return data
