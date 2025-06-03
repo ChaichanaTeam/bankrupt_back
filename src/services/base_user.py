@@ -31,3 +31,9 @@ class BaseUserService:
                         )
 
         return resp
+    
+    @staticmethod
+    def logout() -> JSONResponse:
+        response = JSONResponse({"message": "Goodbye"})
+        response.delete_cookie("authorization")
+        return response

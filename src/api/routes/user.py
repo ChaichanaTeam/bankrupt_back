@@ -43,4 +43,8 @@ def reset_password_request(user_reset: UserTemp, db: Session = Depends(get_db)):
 def reset_password_confirm(password_form: UserPasswordReset, db: Session = Depends(get_db)):
     return UserService.reset_password_confirm(password_form, db)
 
+@router.get("/logout")
+def logout():
+    return UserService.logout()
+
 ## TODO login 2FA
