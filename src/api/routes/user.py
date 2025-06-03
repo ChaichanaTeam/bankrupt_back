@@ -1,11 +1,14 @@
 from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from src.schemas.user import UserCreate, UserLogin, UserTemp, AvailabilityRequest, UserPasswordReset
 from src.schemas.token import Token
 from src.db.dependencies import get_db
 from src.services.user import UserService
 from src.models.user import User
-from src.api.utils.auth import get_current_user
+from src.api.utils.auth import get_current_user_cookie
+from src.core.config import settings
+
 
 router: APIRouter = APIRouter()
 
@@ -26,10 +29,21 @@ def verify_email(user: UserCreate, db: Session = Depends(get_db)):
 @router.post("/login", response_model=Token)
 def login(user_data: UserLogin, db: Session = Depends(get_db)):
     token = UserService.login(user_data, db)
-    return { "token_type": "Bearer", "access_token": token }
+    resp = JSONResponse({"message": "Access granted"})
+    
+    resp.set_cookie(
+                        key="authorization",
+                        value=token,
+                        httponly=True,
+                        secure=True,
+                        samesite="Lax",
+                        max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES*60,
+                        path="/"
+                    )
+    return resp
 
 @router.get("/me")
-def get_user_base_data(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+def get_user_base_data(user: User = Depends(get_current_user_cookie), db: Session = Depends(get_db)):
     return UserService.get_user_base_data(user, db)
 
 @router.post("/reset")

@@ -51,7 +51,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     
     return user
 
-def get_current_user_cookie(token: str = Cookie(None, alias="admin_token"), db: Session = Depends(get_db)) -> User | str:
+def get_current_user_cookie(token: str = Cookie(None, alias="authorization"), db: Session = Depends(get_db)) -> User | str:
     try:
         return get_current_user(token, db)
     except HTTPException as e:

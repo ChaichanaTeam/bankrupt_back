@@ -104,5 +104,5 @@ def admin_user_detail(user_id: int, request: Request,
 @router.get("/logout")
 def admin_logout():
     response = RedirectResponse(url="/admin/login")
-    response.delete_cookie("admin_token")
+    response.delete_cookie("authorization")
     return response
