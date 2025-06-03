@@ -24,23 +24,12 @@ def register_user(user: UserTemp, db: Session = Depends(get_db)):
 @router.post("/verify-email")
 def verify_email(user: UserCreate, db: Session = Depends(get_db)):
     UserService.verify_email(user, db)
-    return {"message": "Verification passed. Wallet attached"}
+    user_data = UserLogin(email=user.email, password=user.password)
+    return UserService.login(user_data, db)
 
-@router.post("/login", response_model=Token)
+@router.post("/login")
 def login(user_data: UserLogin, db: Session = Depends(get_db)):
-    token = UserService.login(user_data, db)
-    resp = JSONResponse({"message": "Access granted"})
-    
-    resp.set_cookie(
-                        key="authorization",
-                        value=token,
-                        httponly=True,
-                        secure=True,
-                        samesite="Lax",
-                        max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES*60,
-                        path="/"
-                    )
-    return resp
+    return UserService.login(user_data, db)
 
 @router.get("/me")
 def get_user_base_data(user: User = Depends(get_current_user_cookie), db: Session = Depends(get_db)):
