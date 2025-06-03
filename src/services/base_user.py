@@ -24,8 +24,8 @@ class BaseUserService:
                             key="authorization",
                             value=token,
                             httponly=True,
-                            secure=False,
-                            samesite="Lax",
+                            secure=True,
+                            samesite="none",
                             max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES*60,
                             path="/"
                         )

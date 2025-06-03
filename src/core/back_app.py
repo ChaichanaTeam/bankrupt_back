@@ -16,6 +16,7 @@ from src.core.config import settings
 class BackendApp(FastAPI):
     def __init__(self):
         super().__init__()
+        self.__initializeRoutes(super())
         super().add_middleware(
             CORSMiddleware,
             allow_origins=settings.ORIGINS,
@@ -26,7 +27,6 @@ class BackendApp(FastAPI):
 
         Base.metadata.create_all(bind=engine)
         super().mount("/static", StaticFiles(directory="src/static"), name="static")
-        self.__initializeRoutes(super())
 
     def __initializeRoutes(self, app: FastAPI) -> None:
         app.include_router(user_routes.router, prefix="/auth", tags=["auth"])
