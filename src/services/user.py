@@ -108,7 +108,7 @@ class UserService(BaseUserService):
         
         # wallet: Wallet = get_wallet(user, db)
         cards = get_cards(user, db)
-        if not card:
+        if not cards:
             raise user_not_found
 
         data = {
