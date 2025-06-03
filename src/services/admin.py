@@ -15,7 +15,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 class AdminService(BaseUserService):
     @staticmethod
-    def login(user_data: UserLogin, db: Session) -> str:
+    def login(user_data: UserLogin, db: Session):
         try:
             if not is_superuser(get_user_by_email(user_data.email, db).id, db):
                 raise credentials_exception()

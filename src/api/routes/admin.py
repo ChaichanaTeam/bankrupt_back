@@ -34,16 +34,14 @@ def admin_login_form(request: Request,
     admin_login: UserLogin = UserLogin(email=email, password=password)
 
     try:
-        token = AdminService.login(admin_login, db)
+        cookie = AdminService.login(admin_login, db)
     except HTTPException as e:
         return (AdminHTML.LOGIN, {"hide_nav": True, "error": f"{e.detail}"})
     except Exception as e:
         traceBack(f"{e}", type=TrackType.ERROR)
         return ("admin/login.html", {"request": request, "hide_nav": True, "error": "Technical issues"})
 
-    resp = RedirectResponse(url="/admin/panel", status_code=HTTP_302_FOUND)
-    resp.set_cookie(key="admin_token", value=token, httponly=True)
-    return resp
+    return cookie
 
 @router.get("/panel")
 @template(AdminHTML.PANEL)
@@ -103,6 +101,4 @@ def admin_user_detail(user_id: int, request: Request,
 
 @router.get("/logout")
 def admin_logout():
-    response = RedirectResponse(url="/admin/login")
-    response.delete_cookie("authorization")
-    return response
+    return AdminService.logout()
