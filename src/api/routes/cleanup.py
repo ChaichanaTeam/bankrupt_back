@@ -8,7 +8,12 @@ from src.db.queries import get_expired_users
 
 router: APIRouter = APIRouter()
 
-@router.delete("/cleanup-unverified")
+@router.delete(
+                "/cleanup-unverified",
+                summary="Cleanup unverified users routine",
+                description="Endpoint created to cleanup users in 24h timespan. Used in routine",
+                response_description="Each time is called returns amount of users deleted"
+        )
 def cleanup_unverified_users(db: Session = Depends(get_db)):
     expiration_time = timedelta(hours=24)
     threshold = datetime.now() - expiration_time

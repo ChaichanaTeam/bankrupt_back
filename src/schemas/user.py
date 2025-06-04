@@ -20,11 +20,6 @@ class UserTemp(BaseModel):
     phone_number: str
     social_security: str
 
-class AvailabilityRequest(BaseModel):
-    email: str | None = None
-    phone_number: str | None = None
-    social_security: str | None = None
-
 class UserLogin(BaseModel):
     email: str
     password: str | None = None

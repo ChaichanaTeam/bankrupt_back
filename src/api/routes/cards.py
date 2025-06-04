@@ -10,7 +10,17 @@ from src.services.cards import CardsService
 
 router: APIRouter = APIRouter()
 
-@router.get("/{four_digits}")
+@router.get(
+            "/{four_digits}",
+            summary="Get single card by 4 last numbers",
+            description="User must be logged into account to perform this option. Provide into route of endpoint last 4 digits of card to get the card. Example: url/card/0443",
+            response_description="Returns all card information",
+            responses={
+                400: {"description": "Internal error accused by inprocessible data which crashed database"},
+                500: {"description": "Function is not properly implemented, yet"},
+                401: {"description": "Credential exception. User is not logged or cookie is corrupted"}
+            }
+        )
 def get_card(four_digits: str, 
              user: User = Depends(get_current_user_cookie), db: Session = Depends(get_db)):
     cards = get_cards(user, db)
@@ -18,7 +28,17 @@ def get_card(four_digits: str,
 
     return card.json()
 
-@router.post("/create")
+@router.post(
+            "/create",
+            summary="Card creation",
+            description="User must be logged into account to perform this option. Creating card using information about user in database",
+            response_description="Returns card data",
+            responses={
+                400: {"description": "Internal error accused by inprocessible data which crashed database"},
+                406: {"description": "User for who card will be created has no wallet"},
+                401: {"description": "Credential exception. User is not logged or cookie is corrupted"}
+            }
+        )
 def create_card(user: User = Depends(get_current_user_cookie), db: Session = Depends(get_db)):
     try:
         card = CardsService.create_card_logic(user, db)
@@ -26,7 +46,18 @@ def create_card(user: User = Depends(get_current_user_cookie), db: Session = Dep
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.delete("/delete")
+@router.delete(
+                "/delete",
+                summary="Deleting card",
+                description="User must be logged into account to perform this option. Deleting card of user. Pass CardDelete body schema",
+                response_description="",
+                responses={
+                400: {"description": "Internal error accused by inprocessible data which crashed database"},
+                406: {"description": "User for who card will be deleted has no wallet"},
+                403: {"description": "Card balance is positive. Cannot delete card with funds on it"},
+                401: {"description": "Credential exception. User is not logged or cookie is corrupted"}
+            }
+        )
 def delete_card(card_delete: CardDelete, user: User = Depends(get_current_user_cookie), db: Session = Depends(get_db)):
     try:
         result = CardsService.delete_card_logic(user, card_delete.card_number, db)
@@ -35,7 +66,18 @@ def delete_card(card_delete: CardDelete, user: User = Depends(get_current_user_c
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.post("/transfer")
+@router.post(
+                "/transfer",
+                summary="Transfering money from card to card",
+                description="User must be logged into account to perform this option. Transfering money from card to card. Transfer operation will be added to history. Pass TransferRequest body schema",
+                response_description="Returns how much money was transfered",
+                responses={
+                    400: {"description": "Internal error accused by inprocessible data which crashed database"},
+                    406: {"description": "Reciever/Sender for who transfering operation will be called has no wallet"},
+                    403: {"description": "Sender has no funds to perform operation"},
+                    401: {"description": "Credential exception. User is not logged or cookie is corrupted"}
+                }
+        )
 def transfer_money(transfer: TransferRequest,
                    db: Session = Depends(get_db),
                    user: User = Depends(get_current_user_cookie)):
@@ -45,11 +87,31 @@ def transfer_money(transfer: TransferRequest,
         f"Transferred {transfer.amount}"
     }
 
-@router.get("")
+@router.get(
+            "",
+            summary="Get list of user\'s cards",
+            description="User must be logged into account to perform this option. Getter for list of user cards. List contains of card data",
+            response_description="Returns list of cards data",
+            responses={
+                400: {"description": "Internal error accused by inprocessible data which crashed database"},
+                406: {"description": "User for who this operation will be called has no wallet"},
+                401: {"description": "Credential exception. User is not logged or cookie is corrupted"}
+            }
+        )
 def get_card_info(user: User = Depends(get_current_user_cookie), db: Session = Depends(get_db)):
     return CardsService.get_card_info_logic(user, db)
 
-@router.post("/history")
+@router.post(
+            "/history",
+            summary="Get transfer history",
+            description="User must be logged into account to perform this option. Getter for list of transfers performed by user with n-card. Pass CardHistoryRequest body schema",
+            response_description="Return list of transfers",
+            responses={
+                400: {"description": "Internal error accused by inprocessible data which crashed database"},
+                406: {"description": "User for who this operation will be called has no wallet"},
+                401: {"description": "Credential exception. User is not logged or cookie is corrupted"}
+            }
+        )
 def get_transfer_history(
     request: CardHistoryRequest,
     user: User = Depends(get_current_user_cookie),

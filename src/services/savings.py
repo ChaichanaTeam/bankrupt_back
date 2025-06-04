@@ -92,6 +92,8 @@ class SavingsService:
         db.refresh(saving_account)
         db.refresh(card)
 
+        return {"message": f"Top up for {data.amount}"}
+
     @staticmethod
     def take_funds(data, user: User, db: Session) -> dict:
 
