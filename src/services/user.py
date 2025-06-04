@@ -110,10 +110,16 @@ class UserService(BaseUserService):
         cards = get_cards(user, db)
 
         data = {
-                "name": user.first_name,
-                "surname": user.last_name,
-                "cards": [card.json() for card in cards]
+            "name": user.first_name,
+            "surname": user.last_name,
+            "cards": [
+                {
+                    "balance": card.balance,
+                    "last4": card.number[-4:]
                 }
+                for card in cards
+            ]
+        }
 
         return data
     
