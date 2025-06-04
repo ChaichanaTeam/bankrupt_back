@@ -8,4 +8,3 @@ pydantic[email]
 python-jose[cryptography]
 python-multipart
 jinja2
-aiofiles

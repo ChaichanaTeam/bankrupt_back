@@ -1,4 +1,105 @@
-# bankrupt_back
+# Backend application for banking
+## Description
 
-Front: https://github.com/ProbablyNoth1ng/Bankrupt
-Deploy: https://bankrupt-bank.vercel.app/
+A demo backend for an online banking application, developed as a university assignment. The project demonstrates key backend technologies and architecture principles using Python and FastAPI.
+
+### Features
+
+- Email sending system via SMTP
+- User registration with email verification
+- Two-factor authentication via email
+- JWT-based authentication
+- Card generation and balance management
+- Transfer history tracking
+- Saving accounts with goal setting
+- Bill creation and payment
+
+### Authors
+
+- [ndmytryshyn5](https://github.com/ndmytryshyn5)  
+- [os3k1mtr1l](https://github.com/os3k1mtr1l)  
+
+**Frontend implementation:**  
+[Frontend GitHub Repository](https://github.com/GormanProg123/Bankrupt)
+
+- [GormanProg123](https://github.com/GormanProg123)  
+- [ProbablyNoth1ng](https://github.com/ProbablyNoth1ng)  
+
+---
+
+## Documentation
+The following files are available for deeper understanding and testing:
+
+- [postman_collection.json](postman_collection.json) — Postman requests collection
+
+- [docs.pdf](docs.pdf) — Technical documentation and architecture overview
+
+- OpenAPI documentation is also available on /docs and /redoc endpoints
+---
+
+## Requirements
+
+All dependencies are listed in [requirements.txt](requirements.txt)
+
+- Python 3.12+
+- pip 3.12+
+- [FastAPI](https://fastapi.tiangolo.com/)
+- [SQLAlchemy](https://www.sqlalchemy.org/)
+- [SQLite](https://www.sqlite.org/)
+- [uvicorn](https://www.uvicorn.org/)
+- [pydantic](https://docs.pydantic.dev/latest/)
+- [passlib[bcrypt]](https://passlib.readthedocs.io/en/stable/ )
+- [python-dotenv](https://pypi.org/project/python-dotenv/)
+- [python-jose[cryptography]](https://python-jose.readthedocs.io/en/latest/)
+- [python-multipart]( https://andrew-d.github.io/python-multipart/)
+- [jinja2](https://jinja.palletsprojects.com/)
+
+---
+
+
+## Launching
+
+### Deployment (Render)
+This project is configured to run on [Render.com](https://render.com/).
+You can use the included [render.yaml](render.yaml) file for automated deployment.
+
+Server variables:
+
+```env
+SECRET_KEY=your-super-secret-key
+EMAIL=your.email@gmail.com
+EMAIL_PASSWORD=your-app-password
+FRONTEND_LINK=http://localhost:3000
+DEBUG=True
+```
+
+### Local run
+
+```bash
+git clone https://github.com/ChaichanaTeam/bankrupt_back
+cd bankrupt_backend
+python -m venv venv
+source venv/bin/activate  # or .\venv\Scripts\activate on Windows
+pip install -r requirements.txt
+```
+
+Create in root folder .env and file var.env with containment of
+
+```env
+SECRET_KEY=your-super-secret-key
+EMAIL=your.email@gmail.com
+EMAIL_PASSWORD=your-app-password
+FRONTEND_LINK=http://localhost:3000
+DEBUG=True
+```
+
+Project was runned and tested with uvicorn ASGI web server. Being in project root type (with uvicorn installed)
+
+```bash
+uvicorn src.main:app --reload
+```
+
+---
+
+## License
+Codebase: [License](LICENSE)

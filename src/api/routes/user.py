@@ -9,10 +9,6 @@ from src.api.utils.auth import get_current_user_cookie
 
 router: APIRouter = APIRouter()
 
-@router.get("/check-availability")
-def check_availability(payload: AvailabilityRequest, db: Session = Depends(get_db)):
-    return UserService.check_availability(payload, db)
-
 @router.post("/register")
 def register_user(user: UserTemp, db: Session = Depends(get_db)):
     UserService.register(user, db)
@@ -22,7 +18,7 @@ def register_user(user: UserTemp, db: Session = Depends(get_db)):
 def verify_email(user: UserCreate, db: Session = Depends(get_db)):
     UserService.verify_email(user, db)
     user_data = UserLogin(email=user.email, password=user.password)
-    return UserService.login(user_data, db)
+    return UserService.login(user_data.email, db)
 
 @router.post("/2fa/request")
 def login(user_data: UserLogin, db: Session = Depends(get_db)):

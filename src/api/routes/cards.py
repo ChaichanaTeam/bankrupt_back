@@ -26,7 +26,7 @@ def create_card(user: User = Depends(get_current_user_cookie), db: Session = Dep
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.post("/delete")
+@router.delete("/delete")
 def delete_card(card_delete: CardDelete, user: User = Depends(get_current_user_cookie), db: Session = Depends(get_db)):
     try:
         result = CardsService.delete_card_logic(user, card_delete.card_number, db)
