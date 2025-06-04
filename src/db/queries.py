@@ -1,15 +1,14 @@
 from datetime import timedelta, datetime, timezone
 from sqlalchemy.orm import Session
 from sqlalchemy import exists, select
+
 from src.schemas.user import UserCreate, UserLogin
-from src.schemas.token import Token
 from src.models.wallet import Wallet
 from src.models.wallet_history import TransferHistory
 from src.models.cards import Card
 from src.models.user import User, UnverifiedUser
 from src.models.savings import Saving_account
 from src.models.bills import Bills
-from typing import Optional
 
 def is_user_existing(user: UserCreate, db: Session) -> bool:
     return db.query(exists().where(
@@ -32,7 +31,7 @@ def get_unverified_user(email: str, db: Session) -> UnverifiedUser:
 def get_user_by_email(email: str, db: Session) -> User:
     return db.query(User).filter(User.email == email).first()
 
-def get_user_by_card_number(db: Session, card_number: str) -> Optional[User]:
+def get_user_by_card_number(card_number: str, db: Session) -> User | None:
     return(
         db.query(User)
         .join(Wallet, User.id == Wallet.user_id)
@@ -59,7 +58,7 @@ def get_cards(user: User, db: Session) -> list[Card]:
         .filter(Wallet.user_id == user.id).all()
     )
 
-def get_card_by_id(user: User, card_id: int, db: Session) -> Optional[Card]:
+def get_card_by_id(user: User, card_id: int, db: Session) -> Card | None:
     return (
         db.query(Card)
         .join(Wallet, Card.wallet_id == Wallet.id)
@@ -71,7 +70,7 @@ def get_card_by_id(user: User, card_id: int, db: Session) -> Optional[Card]:
     )
 
 
-def get_card_by_number(user: User, card_number: str, db: Session) -> Optional[Card]:
+def get_card_by_number(user: User, card_number: str, db: Session) -> Card | None:
     return(
         db.query(Card)
         .join(Wallet, Card.wallet_id == Wallet.id)
@@ -105,7 +104,7 @@ def get_saving_accounts(user: User, db: Session):
         .filter(Wallet.user_id == user.id).all()
     )
 
-def get_saving_account_by_id(user: User, account_id: int, db: Session) -> Optional[Saving_account]:
+def get_saving_account_by_id(user: User, account_id: int, db: Session) -> Saving_account | None:
     return (
         db.query(Saving_account)
         .join(Wallet, Saving_account.wallet_id == Wallet.id)
@@ -123,11 +122,11 @@ def get_bill_by_id(user, bill_id: int, db: Session):
         .first()
     )
 
-def is_superuser(id: int, db: Session) -> bool:
-    return db.query(exists().where(
-        (User.id == id) &
-        (User.is_superuser == True)
-    )).scalar()
-
 def get_all_users(db: Session) -> list[User]:
     return db.execute(select(User)).scalars().all()
+
+def get_user_by_reset_token(reset_token: str, db: Session) -> User:
+    return db.query(User).filter(User.reset_token == reset_token).first()
+
+def validate_token(user: User, db: Session) -> bool:
+    return user != None and (datetime.now(timezone.utc) - user.reset_token_created_at.replace(tzinfo=timezone.utc) <= timedelta(hours=1))

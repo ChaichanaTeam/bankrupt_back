@@ -2,8 +2,9 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 from fastapi import FastAPI
-from src.core.traceback import traceBack, TrackType
 from fastapi.templating import Jinja2Templates
+
+from src.core.traceback import traceBack, TrackType
 
 class Settings:
     def __init__(self):
@@ -14,7 +15,6 @@ class Settings:
             traceBack(".env loaded")
         else:
             traceBack(".env not loaded, using os variables if exists. Check for variables if errors are raised")
-            
 
         self.DATABASE_URL: str = "sqlite:///./bank.db"
         self.SECRET_KEY: str = os.getenv("SECRET_KEY", "fallback-key")

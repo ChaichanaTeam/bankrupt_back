@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+
 from src.models.user import User
 from src.schemas.cards import TransferRequest, CardHistoryRequest, CardDelete
 from src.db.dependencies import get_db
@@ -46,9 +47,7 @@ def transfer_money(transfer: TransferRequest,
 
 @router.get("")
 def get_card_info(user: User = Depends(get_current_user_cookie), db: Session = Depends(get_db)):
-    info = CardsService.get_card_info_logic(user, db)
-
-    return info
+    return CardsService.get_card_info_logic(user, db)
 
 @router.post("/history")
 def get_transfer_history(

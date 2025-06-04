@@ -1,22 +1,25 @@
-import random
+from random import randint
 from datetime import datetime, timedelta, timezone
 from sqlalchemy import exists
 from sqlalchemy.orm import Session
+
 from src.db.queries import get_wallet
 from src.models.user import User
+from src.schemas.cards import TransferRequest
 from src.models.cards import Card
 from src.models.wallet_history import TransferHistory, TransactionType
 from src.core.exceptions import user_not_found, forbidden_wallet_action, card_not_found, cannot_delete_card_with_balance
 from src.db.queries import get_cards, get_user_by_card_number, get_card_transfer_history_records, get_card_by_number
+from src.core.traceback import traceBack, TrackType
 
 def generate_card_number(db: Session):
     while True:
-        number = ''.join(str(random.randint(0, 9)) for _ in range(16))
-        if not db.query(exists().where(Card.number == number)).scalar():
+        number = ''.join(str(randint(0, 9)) for _ in range(16))
+        if not get_user_by_card_number(number, db):
             return number
     
 def generate_cvv():
-    return ''.join(str(random.randint(0, 9)) for _ in range(3))
+    return ''.join(str(randint(0, 9)) for _ in range(3))
 
 def generate_expiration_date():
     future_date = datetime.now(timezone.utc) + timedelta(days=365 * 5)
@@ -67,7 +70,7 @@ class CardsService:
 
 
     @staticmethod
-    def transfer_money_logic(transfer, db: Session, user: User):
+    def transfer_money_logic(transfer: TransferRequest, db: Session, user: User):
         receiver = get_user_by_card_number(db, transfer.to_card_number)
         if not receiver:
             raise user_not_found
@@ -101,7 +104,7 @@ class CardsService:
         return history_record
 
     @staticmethod
-    def get_card_info_logic(user: User, db: Session) -> float:
+    def get_card_info_logic(user: User, db: Session) -> list[dict]:
         cards = get_cards(user, db)
         if not cards:
             raise user_not_found

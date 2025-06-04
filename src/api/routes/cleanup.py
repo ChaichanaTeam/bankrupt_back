@@ -1,10 +1,10 @@
 from datetime import timedelta, datetime
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+
 from src.schemas.user import UserTemp as UnverifiedUser
 from src.db.dependencies import get_db
 from src.db.queries import get_expired_users
-
 
 router: APIRouter = APIRouter()
 

@@ -1,5 +1,4 @@
-from fastapi import HTTPException, status, Request
-from src.core.config import settings
+from fastapi import HTTPException, status
 
 def credentials_exception(reason: str = "Could not validate credentials") -> HTTPException:
     return HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,

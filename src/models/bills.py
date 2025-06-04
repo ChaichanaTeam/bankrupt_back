@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Boolean, Integer, Float, DateTime, ForeignKey, String, Enum as SQLEnum
 from sqlalchemy.orm import relationship
 from datetime import datetime
+
 from src.db.base import Base
 
 class Bills(Base):

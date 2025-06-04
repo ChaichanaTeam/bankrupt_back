@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
-from src.schemas.user import UserLogin
 from fastapi.responses import JSONResponse
+
+from src.schemas.user import UserLogin
 from src.db.queries import get_user_by_email
 from src.api.utils.auth import create_access_token
 from src.core.exceptions import credentials_exception

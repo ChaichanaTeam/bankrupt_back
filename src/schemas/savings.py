@@ -1,11 +1,8 @@
 from pydantic import BaseModel, Field
-from typing import List
 
 class Saving_Account_creation(BaseModel):
     name: str
     goal: float = Field(..., gt=0, description='Goal must be positive')
-
-
 
 class Saving_Account_out(BaseModel):
     id: int

@@ -1,12 +1,13 @@
 from sqlalchemy import exists
 from sqlalchemy.orm import Session
+from typing import List
+
 from src.core.exceptions import user_not_found, forbidden_wallet_action, card_not_found, saving_account_not_found ,cannot_delete_saving_account_with_balance
 from src.db.queries import get_wallet, get_cards, get_card_by_id, get_saving_accounts, get_saving_account_by_id
 from src.models.user import User
 from src.models.savings import Saving_account
 from src.models.wallet_history import TransferHistory, TransactionType
 from src.schemas.savings import Saving_Account_creation, Saving_Account_out
-from typing import List
 
 
 class SavingsService:

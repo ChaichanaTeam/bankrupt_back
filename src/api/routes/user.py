@@ -1,14 +1,11 @@
 from fastapi import APIRouter, Depends
-from fastapi.responses import JSONResponse, Response
 from sqlalchemy.orm import Session
+
 from src.schemas.user import UserCreate, UserLogin, UserTemp, AvailabilityRequest, UserPasswordReset
-from src.schemas.token import Token
 from src.db.dependencies import get_db
 from src.services.user import UserService
 from src.models.user import User
 from src.api.utils.auth import get_current_user_cookie
-from src.core.config import settings
-
 
 router: APIRouter = APIRouter()
 

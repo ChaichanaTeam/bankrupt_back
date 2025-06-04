@@ -4,13 +4,14 @@ from typing import Any
 from fastapi import Depends, Cookie, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
+from random import choices, shuffle
+from string import digits, ascii_uppercase
+
 from src.models.user import User
 from src.core.config import settings
 from src.core.exceptions import credentials_exception
 from src.db.dependencies import get_db
 from src.db.queries import get_user_by_email
-import random, string
-from src.core.traceback import traceBack, TrackType
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
@@ -23,11 +24,11 @@ def create_access_token(data: dict, expires_delta: timedelta = timedelta(minutes
     return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
 def create_verification_code() -> str:
-    nums = random.choices(string.digits, k=4)
-    letters = random.choices(string.ascii_uppercase, k=4)
+    nums = choices(digits, k=4)
+    letters = choices(ascii_uppercase, k=4)
     
     code = letters + nums
-    random.shuffle(code)
+    shuffle(code)
     return ''.join(code)
 
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:

@@ -1,5 +1,10 @@
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
+from datetime import datetime, timezone
+from urllib.parse import urljoin, urlencode
+from secrets import token_urlsafe
+from typing import Any
+
 from src.schemas.user import UserCreate, UserTemp, UserPasswordReset
 from src.models.user import User, UnverifiedUser
 from src.models.wallet import Wallet
@@ -7,16 +12,11 @@ from src.db.queries import is_user_existing, is_code_valid, get_unverified_user
 from src.api.utils.auth import create_verification_code
 from src.api.utils.mail import send_email, EmailType
 from src.models.cards import Card
-from src.db.queries import get_cards, get_user_by_card_number
-from src.core.exceptions import user_not_found, forbidden_wallet_action, card_not_found
+from src.db.queries import get_cards, get_user_by_reset_token, validate_token
 from src.core.exceptions import user_exists_exception, code_verification_exception, credentials_exception, bad_requset
 from src.services.base_user import BaseUserService
 from src.core.traceback import traceBack, TrackType
-from typing import Any
-from secrets import token_urlsafe
 from src.core.config import settings
-from urllib.parse import urljoin, urlencode
-from datetime import datetime, timedelta, timezone
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -106,8 +106,7 @@ class UserService(BaseUserService):
         if not user:
             raise credentials_exception()
         
-        # wallet: Wallet = get_wallet(user, db)
-        cards = get_cards(user, db)
+        cards: list[Card] = get_cards(user, db)
 
         data = {
             "name": user.first_name,
@@ -134,7 +133,7 @@ class UserService(BaseUserService):
         
         reset_token: str = token_urlsafe(32)
 
-        while db.query(User).filter(User.reset_token == reset_token).count() > 0:
+        while get_user_by_reset_token(reset_token, db) != None:
             reset_token: str = token_urlsafe(32)
         
         user.reset_token = reset_token
@@ -157,9 +156,9 @@ class UserService(BaseUserService):
 
     @staticmethod
     def reset_password_confirm(password_form: UserPasswordReset, db: Session) -> dict[str, Any]:
-        user: User = db.query(User).filter(User.reset_token == password_form.token).first()
+        user: User = get_user_by_reset_token(password_form.token, db)
         
-        if user is None or (datetime.now(timezone.utc) - user.reset_token_created_at.replace(tzinfo=timezone.utc) > timedelta(hours=1)):
+        if not validate_token(user, db):
             raise credentials_exception("Reset token is not valid")
 
         user.hashed_password = pwd_context.hash(password_form.new_password)

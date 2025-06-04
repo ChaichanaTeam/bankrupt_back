@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from typing import List
+
 from src.models.user import User
 from src.schemas.bills import BillCreate, BillOut, BillPay
 from src.db.dependencies import get_db
 from src.api.utils.auth import get_current_user_cookie
 from src.services.bills import BillsService
-from typing import List
 
 router: APIRouter = APIRouter()
 

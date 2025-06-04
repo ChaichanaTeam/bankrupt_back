@@ -1,7 +1,8 @@
 from sqlalchemy import Column, Integer, String, Date, TIMESTAMP, text, Boolean, ForeignKey, Float
 from sqlalchemy.orm import relationship
-from src.db.base import Base
 from typing import Any
+
+from src.db.base import Base
 
 class Card(Base):
     __tablename__ = 'cards'

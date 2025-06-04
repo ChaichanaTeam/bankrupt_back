@@ -1,23 +1,24 @@
-import smtplib
+from smtplib import SMTP
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.message import EmailMessage
-from src.core.config import settings
 from pathlib import Path
-from src.core.traceback import traceBack, TrackType
 from enum import StrEnum
+
+from src.core.config import settings
+from src.core.traceback import traceBack, TrackType
 
 class EmailType(StrEnum):
     REGISTRATION = "email/code.html"
     PASSWORD_RESET = "email/reset.html"
-
+    TWOFA = "email/2fa.html"
 
 class EmailServer:
     def __init__(self):
         self.connect()
 
     def connect(self) -> None:
-        self.smtp = smtplib.SMTP("smtp.gmail.com", 587)
+        self.smtp = SMTP("smtp.gmail.com", 587)
         self.smtp.starttls()
         self.smtp.login(settings.EMAIL, settings.EMAIL_PASSWORD)
     
@@ -34,7 +35,7 @@ class EmailServer:
         try:
             self.smtp.send_message(msg)
         except Exception as e:
-            print(f"Resending after reconnect: {e}")
+            traceBack(f"Resending after reconnect: {e}", type=TrackType.ERROR)
             self.connect()
             self.smtp.send_message(msg)
 
@@ -45,7 +46,6 @@ class EmailServer:
             except:
                 pass
     
-
 email_service: EmailServer = EmailServer()
 
 def send_email(email: str, title: str, email_type: EmailType, **kwargs) -> None:

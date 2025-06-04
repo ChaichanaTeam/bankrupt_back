@@ -1,8 +1,9 @@
+from sqlalchemy.orm import Session
+
 from src.models.bills import Bills
 from src.db.queries import get_wallet, get_card_by_number, get_bill_by_id
 from src.core.exceptions import user_not_found, card_not_found, forbidden_wallet_action
 from src.models.wallet_history import TransferHistory, TransactionType
-from sqlalchemy.orm import Session
 
 class BillsService:
     @staticmethod

@@ -1,8 +1,9 @@
 from sqlalchemy import Column, Integer, Float, DateTime, ForeignKey, String, Enum as SQLEnum
 from sqlalchemy.orm import relationship
 from datetime import datetime
-from src.db.base import Base
 from enum import Enum
+
+from src.db.base import Base
 
 class TransactionType(Enum):
     TRANSFER = 0

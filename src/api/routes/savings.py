@@ -32,10 +32,6 @@ def topUp_saving_account(data: Saving_Account_TopUp, user: User = Depends(get_cu
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    return{
-        f"Added {amount}"
-    }
-
 @router.post("/decrease")
 def decrease_saving_account(data: Saving_Account_TopUp, user: User = Depends(get_current_user_cookie), db: Session = Depends(get_db)):
 
@@ -43,11 +39,6 @@ def decrease_saving_account(data: Saving_Account_TopUp, user: User = Depends(get
         return SavingsService.take_funds(data, user, db)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-
-    return{
-        f"Taken {amount}"
-    }
-
 
 @router.post("/delete")
 def delete_saving_account(data: Saving_Account_Delete, user: User = Depends(get_current_user_cookie), db: Session = Depends(get_db)):
