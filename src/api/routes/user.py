@@ -24,9 +24,13 @@ def verify_email(user: UserCreate, db: Session = Depends(get_db)):
     user_data = UserLogin(email=user.email, password=user.password)
     return UserService.login(user_data, db)
 
-@router.post("/login")
+@router.post("/2fa/request")
 def login(user_data: UserLogin, db: Session = Depends(get_db)):
-    return UserService.login(user_data, db)
+    return UserService.twofa_request(user_data, db)
+
+@router.post("/2fa/confirm")
+def twofa_confirm(user_data: UserLogin, db: Session = Depends(get_db)):
+    return UserService.twofa_confirm(user_data, db)
 
 @router.get("/me")
 def get_user_base_data(user: User = Depends(get_current_user_cookie), db: Session = Depends(get_db)):
@@ -43,5 +47,3 @@ def reset_password_confirm(password_form: UserPasswordReset, db: Session = Depen
 @router.get("/logout")
 def logout():
     return UserService.logout()
-
-## TODO login 2FA

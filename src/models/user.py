@@ -20,7 +20,7 @@ class User(Base):
     created_at: Column = Column("created_at", TIMESTAMP, server_default=text("CURRENT_TIMESTAMP"))
 
     last_2fa_code: Column = Column(String, nullable=True, default=None)
-    expires_at_2fa: Column = Column(TIMESTAMP, nullable=True, default=None)
+    expires_at_2fa: Column = Column(TIMESTAMP(timezone=True), nullable=True, default=None)
 
     reset_token: Column = Column(String, nullable=True, default=None)
     reset_token_created_at: Column = Column(TIMESTAMP(timezone=True), nullable=True, default=None)

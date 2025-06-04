@@ -70,8 +70,8 @@ class CardsService:
 
 
     @staticmethod
-    def transfer_money_logic(transfer: TransferRequest, db: Session, user: User):
-        receiver = get_user_by_card_number(db, transfer.to_card_number)
+    def transfer_money_logic(transfer: TransferRequest, user: User, db: Session):
+        receiver = get_user_by_card_number(transfer.to_card_number, db)
         if not receiver:
             raise user_not_found
 

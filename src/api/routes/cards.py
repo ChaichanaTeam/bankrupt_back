@@ -39,7 +39,7 @@ def delete_card(card_delete: CardDelete, user: User = Depends(get_current_user_c
 def transfer_money(transfer: TransferRequest,
                    db: Session = Depends(get_db),
                    user: User = Depends(get_current_user_cookie)):
-    CardsService.transfer_money_logic(transfer, db, user)
+    CardsService.transfer_money_logic(transfer, user, db)
 
     return {
         f"Transferred {transfer.amount}"

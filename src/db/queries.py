@@ -129,4 +129,7 @@ def get_user_by_reset_token(reset_token: str, db: Session) -> User:
     return db.query(User).filter(User.reset_token == reset_token).first()
 
 def validate_token(user: User, db: Session) -> bool:
-    return user != None and (datetime.now(timezone.utc) - user.reset_token_created_at.replace(tzinfo=timezone.utc) <= timedelta(hours=1))
+    return user != None and(datetime.now(timezone.utc) - user.reset_token_created_at.replace(tzinfo=timezone.utc) <= timedelta(hours=1))
+
+def validate_code(user: User, twofa_code: str) -> bool:
+    return user != None and user.last_2fa_code == twofa_code and (datetime.now(timezone.utc) - user.expires_at_2fa.replace(tzinfo=timezone.utc) <= timedelta(hours=1))

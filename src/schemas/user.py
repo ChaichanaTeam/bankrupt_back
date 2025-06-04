@@ -27,7 +27,8 @@ class AvailabilityRequest(BaseModel):
 
 class UserLogin(BaseModel):
     email: str
-    password: str
+    password: str | None = None
+    twofa_code: str | None = None
 
 class UserPasswordReset(BaseModel):
     token: str
