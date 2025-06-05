@@ -30,9 +30,11 @@ A demo backend for an online banking application, developed as a university assi
 ## Documentation
 The following files are available for deeper understanding and testing:
 
-- [postman_collection.json](postman_collection.json) — Postman requests collection
+- [postman_collection.json](docs/Bankrupt_API.postman_collection.json) — Postman requests collection
 
-- [docs.pdf](docs.pdf) — Technical documentation and architecture overview
+- [openapi.json](docs/openapi.json) - Pre-downloaded Swagger-UI file
+
+- [docs.pdf](docs/API_documentation.pdf) — Technical documentation and architecture overview
 
 - OpenAPI documentation is also available on /docs and /redoc endpoints
 ---

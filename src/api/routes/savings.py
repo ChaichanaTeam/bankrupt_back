@@ -83,7 +83,7 @@ def decrease_saving_account(data: Saving_Account_TopUp, user: User = Depends(get
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.post(
+@router.delete(
                 "/delete",
                 summary="Deletes savings account",
                 description="User must be logged into account to perform this option. Deletes savings account. Pass Saving_Account_Delete body schema",

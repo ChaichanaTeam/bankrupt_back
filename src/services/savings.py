@@ -131,6 +131,8 @@ class SavingsService:
         db.refresh(saving_account)
         db.refresh(card)
 
+        return {"message": f"Decreased by {data.amount}"}
+
     def delete_saving_account_logic(user: User, saving_account_id: int, db: Session) -> dict:
         saving_account = get_saving_account_by_id(user, saving_account_id, db)
 

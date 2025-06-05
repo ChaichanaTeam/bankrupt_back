@@ -18,7 +18,7 @@ def cleanup_unverified_users(db: Session = Depends(get_db)):
     expiration_time = timedelta(hours=24)
     threshold = datetime.now() - expiration_time
 
-    expired_users: list[UnverifiedUser] = get_expired_users(threshold, db)
+    expired_users: list[UnverifiedUser] = get_expired_users(db, threshold)
 
     for user in expired_users:
         db.delete(user)
