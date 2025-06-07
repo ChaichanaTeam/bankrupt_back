@@ -5,7 +5,7 @@
 		"description": "Some operations needed user to be logged.\n\nIf password was reseted, change password in login process\n\nSome of variables in body are non-consistent like card number or verification codes which are depends on database or random generation",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "43912649",
-		"_collection_link": "https://bunkruptxd.postman.co/workspace/10ef5b7f-38a8-449c-842e-983570b71f3c/collection/43912649-99bbee35-fa59-4dd7-83a3-28f2611cc1e8?action=share&source=collection_link&creator=43912649"
+		"_collection_link": "https://bunkruptxd.postman.co/workspace/BunkruptXD-Workspace~10ef5b7f-38a8-449c-842e-983570b71f3c/collection/43912649-99bbee35-fa59-4dd7-83a3-28f2611cc1e8?action=share&source=collection_link&creator=43912649"
 	},
 	"item": [
 		{
@@ -130,7 +130,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"user@localhost.me\",\r\n    \"password\": \"p455w0rd\"\r\n}",
+							"raw": "{\r\n    \"email\": \"user@localhost.me\",\r\n    \"password\": \"p455w0rd2\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -158,7 +158,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"user@localhost.me\",\r\n    \"twofa_code\": \"318J7QCZ\"\r\n}",
+							"raw": "{\r\n    \"email\": \"user@localhost.me\",\r\n    \"twofa_code\": \"56M88ECG\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -567,7 +567,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Electricity\",\r\n    \"amount\": 250.0,\r\n    \"due_date\": \"??\"\r\n}",
+							"raw": "{\r\n    \"name\": \"Parking fine\",\r\n    \"amount\": 40.0,\r\n    \"due_date\": \"2025-06-30T23:59:59\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -614,7 +614,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"bill_id\": ?,\r\n    \"card_number\": \"\"\r\n}",
+							"raw": "{\r\n    \"bill_id\": 6,\r\n    \"card_number\": \"0953327295777565\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -641,7 +641,7 @@
 	"variable": [
 		{
 			"key": "api_link",
-			"value": "localhost:8000",
+			"value": "",
 			"type": "default"
 		}
 	]

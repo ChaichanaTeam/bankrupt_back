@@ -8,3 +8,7 @@ pydantic[email]
 python-jose[cryptography]
 python-multipart
 jinja2
+pytest
+requests
+pytest-order
+pytest-html
