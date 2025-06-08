@@ -174,3 +174,4 @@ cython_debug/
 .pypirc
 
 start.bat
+bank.db
