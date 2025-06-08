@@ -388,7 +388,7 @@ class TestBILLS:
         traceBack("END OF BILLS")
 
 @pytest.mark.order(999)
-class END:
+class TestEND:
     def test_end(self, client: requests.Session, test_user, db):
         print()
 
